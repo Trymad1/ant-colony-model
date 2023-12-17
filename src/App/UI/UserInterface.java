@@ -106,9 +106,6 @@ public class UserInterface extends JFrame {
         worldSize = new Dimension(worldPanel.getPreferredSize().width - 10, 
                                   worldPanel.getPreferredSize().height - 10);
         
-        System.out.println(worldSize);
-        System.out.println(worldPanel.getPreferredSize());
-
         setResizable(false);
         pack();
         setVisible(true);

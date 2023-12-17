@@ -5,19 +5,21 @@ import java.awt.Point;
 import java.util.Queue;
 
 import App.Model.CanTake;
+import App.Model.World;
 import App.Model.Entity.Creature;
 import App.Model.Entity.Entity;
+import App.Util.EntityParams;
 
 public abstract class Ant extends Creature implements CanTake {
 
     protected Queue<Entity> takedItem;
 
-    public Ant(Color color, Point point) {
-        super(color, point, 1);
+    public Ant(Color color, Point point, World world) {
+        super(color, point, EntityParams.Sizes.ANT, world);
     }
 
-    public Ant(Color color) {
-        super(color, 1);
+    public Ant(Color color, World world) {
+        super(color, EntityParams.Sizes.ANT, world);
     }
 
     @Override

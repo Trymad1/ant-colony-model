@@ -19,14 +19,10 @@ public abstract class EntityParams {
 
     public static class Sizes {
 
-        public static int ANT_COLLECTOR = 1;
-
-        public static int ANT_SOLDIER = 1;
-
-        public static int ANT_SCOUT = 1;
+        public static int ANT = 1;
 
         public static int ANTHILL = 3;
 
-        public static int FOOD = 3;
+        public static int FOOD = 1;
     }
 }

@@ -2,17 +2,19 @@ package App.Model.Entity.Ant;
 
 import java.awt.Color;
 import java.awt.Point;
+import java.util.List;
 
+import App.Model.World;
 import App.Util.EntityParams;
 
 public class CollectorAnt extends Ant {
 
-    public CollectorAnt(Point point) {
-        super(EntityParams.Colors.ANT_COLLECTOR, point);
+    public CollectorAnt(Point point, World world) {
+        super(EntityParams.Colors.ANT_COLLECTOR, point, world);
     }
     
-    public CollectorAnt() {
-        super(Color.DARK_GRAY);
+    public CollectorAnt(World world) {
+        super(Color.DARK_GRAY, world);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package App.UI;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -10,7 +11,6 @@ import javax.swing.JPanel;
 import App.Model.Updatable;
 import App.Model.World;
 import App.Model.Entity.Entity;
-import App.Model.Entity.Ant.Anthill;
 
 public class WorldPanel extends JPanel implements Updatable{
 
@@ -30,21 +30,27 @@ public class WorldPanel extends JPanel implements Updatable{
 
     @Override
     protected void paintComponent(Graphics g) {
-        System.out.println(this.getPreferredSize() + "TEST");
-
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;    
         
         Map<Point, Entity> entities = world.getEntities();
-
         final Point nextPoint = new Point(0,0);
         entities.forEach((point, entity) -> {
             nextPoint.x = (point.x * SCALING) + WORLD_BOUND;
             nextPoint.y = (point.y * SCALING) + WORLD_BOUND;
-            System.out.println(nextPoint);
             g2d.setColor(entity.getColor());
             g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
         });
+
+        // TODO DEBUG
+        // for (Point iterable_element : entity.getNearPoints().keySet()) {
+        //     nextPoint.x = (iterable_element.x * SCALING) + WORLD_BOUND;
+        //     nextPoint.y = (iterable_element.y * SCALING) + WORLD_BOUND;
+        //     g2d.setColor(Color.RED);
+        //     g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
+        // }
+
+
     }
 
     public void setWorld(World world) {

@@ -22,9 +22,13 @@ public class World {
 
     private Dimension worldSize;
 
+    private final int DEFAULT_SIZE_WIDTH = 100;
+    private final int DEFAULT_SIZE_HEIGHT = 100;
+
     public World() {
 
         entities = new HashMap<>();
+        worldSize = new Dimension(DEFAULT_SIZE_WIDTH, DEFAULT_SIZE_HEIGHT);
         updatableObjects = new ArrayList<>();
 
         Map<PheromoneTypes, Map<Point, Pheromone>> tempMap = new HashMap<>();
@@ -32,7 +36,7 @@ public class World {
         tempMap.put(PheromoneTypes.SOLDIER, new HashMap<>());
         pheromones = Collections.unmodifiableMap(new HashMap<>());
 
-        anthill = new Anthill();
+        anthill = new Anthill(this);
     }
 
     public World(Dimension worldSize) {
@@ -46,8 +50,8 @@ public class World {
 
     public void createRandomWorld() {
         final Point anthillPoint = new Point(
-            (worldSize.width / 2) - (int) (anthill.getSize() / 2) - 1,
-            (worldSize.height / 2)  - (int) (anthill.getSize() / 2) - 1);
+            ((worldSize.width - 1) / 2),
+            ((worldSize.height - 1) / 2));
         createEntity(anthill, anthillPoint);
     }
 
@@ -80,14 +84,29 @@ public class World {
 
     private void createEntity(Entity entity, Point point) {
         List<Point> coord = new ArrayList<>();
-        for (int i = point.x; i < point.x + entity.getSize(); i++) {
-            for (int j = point.y; j < point.y + entity.getSize(); j++) {
+
+        // Единица в четном случае отнимается для того, чтобы
+        // центр элемента оставался в том же месте
+        int centeredX = entity.getSize() % 2 == 0 ?
+            point.x - ((entity.getSize() / 2) - 1) :
+            point.x - entity.getSize() / 2;
+        
+        int centeredY = entity.getSize() % 2 == 0 ?
+            point.y - ((entity.getSize() / 2) - 1) :
+            point.y - entity.getSize() / 2;
+        
+        final Point centeredPoint = new Point(centeredX, centeredY);
+        for (int i = centeredPoint.x; i < centeredPoint.x + entity.getSize(); i++) {
+            for (int j = centeredPoint.y; j < centeredPoint.y + entity.getSize(); j++) {
                 coord.add(new Point(i,j));
             }
         }
 
         if (isPossibleToCreate(coord) == false) return;
-        coord.forEach(emptyPoint -> entities.put(emptyPoint, entity));
+        entity.setPoint(point);
+        coord.forEach(emptyPoint -> {
+            entities.put(emptyPoint, entity);
+        });
     }
 
     private boolean isPossibleToCreate(List<Point> coord) {

@@ -1,9 +1,11 @@
 package App.Model.Entity.Ant;
 
 import java.awt.Point;
+import java.util.List;
 import java.util.Queue;
 
 import App.Model.Updatable;
+import App.Model.World;
 import App.Model.Entity.Entity;
 import App.Util.EntityParams;
 
@@ -12,12 +14,12 @@ public class Anthill extends Entity implements Updatable {
     private float foodQuantity; 
     
 
-    public Anthill(Point point) {
-        super(EntityParams.Colors.ANTHILL, point, EntityParams.Sizes.ANTHILL);
+    public Anthill(Point point, World world) {
+        super(EntityParams.Colors.ANTHILL, point, EntityParams.Sizes.ANTHILL, world);
     }
 
-    public Anthill() {
-        super(EntityParams.Colors.ANTHILL, EntityParams.Sizes.ANTHILL);
+    public Anthill(World world) {
+        super(EntityParams.Colors.ANTHILL, EntityParams.Sizes.ANTHILL, world);
     }
 
     public float getFoodQuantity() {
