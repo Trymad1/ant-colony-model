@@ -15,6 +15,5 @@ public class Main {
         userInterface.setWorldForDisplay(world);
 
         final Controller controller = new Controller(userInterface, world);
-        world.createRandomWorld();
     }
 }

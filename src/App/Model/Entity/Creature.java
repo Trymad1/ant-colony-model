@@ -3,7 +3,7 @@ package App.Model.Entity;
 import java.awt.Color;
 import java.awt.Point;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 
 import App.Model.Movable;
 import App.Model.Updatable;
@@ -23,6 +23,9 @@ public abstract class Creature extends Entity implements Updatable, Movable {
     
     @Override
     public void move(Point point) {
-        
+        final Map<Point, Entity> entities = world.getEntitiesInWorld();
+        entities.remove(this.point);
+        entities.put(point, this);
+        this.point.setLocation(point);
     }
 }

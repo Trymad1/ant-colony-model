@@ -38,23 +38,23 @@ public abstract class Entity {
         // При четном значении левая верхняя граница не должна меняться,
         // поэтому при вычислении добавляется единица, компенсирующая лишний отступ
         final Point leftTop = size % 2 == 0 ?
-            new Point((point.x - intend) + 1, (point.y - intend) + 1) :
+            new Point((point.x - intend + 1), (point.y - intend) + 1) :
             new Point(point.x - intend, point.y - intend);
             
-        final Point leftBottom = new Point(leftTop.x, leftTop.y + (size + 1));
+        final Point leftBottom = new Point(leftTop.x, (leftTop.y + (size + 1)));
         final Point rightTop = new Point(leftTop.x + (size + 1), leftTop.y);
         final Point rightBottom = new Point(leftTop.x + (size + 1), leftTop.y + (size + 1));
 
         possiblePoints.add(leftTop);
         possiblePoints.add(rightBottom);
-        possiblePoints.add(rightTop);
+        possiblePoints.add(rightTop); 
         possiblePoints.add(leftBottom);
-
-        for (int i = 1; i < size + 1; i++) {
-            possiblePoints.add(new Point(leftTop.x + i, leftTop.y));
-            possiblePoints.add(new Point(leftTop.x, leftTop.y + i));
-            possiblePoints.add(new Point(rightBottom.x - i, rightBottom.y));
-            possiblePoints.add(new Point(rightBottom.x, rightBottom.y - i));
+            
+        for (int j = 1; j < size + 1; j++) {
+            possiblePoints.add(new Point(leftTop.x + j, leftTop.y));
+            possiblePoints.add(new Point(leftTop.x, leftTop.y + j));
+            possiblePoints.add(new Point(rightBottom.x - j, rightBottom.y));
+            possiblePoints.add(new Point(rightBottom.x, rightBottom.y - j));
         }
 
         final Map<Point, Optional<Entity>> nearPoints = new HashMap<>();
@@ -64,7 +64,7 @@ public abstract class Entity {
         .filter(point -> (point.x < worldSize.width && point.x >= 0) &&
                           point.y < worldSize.height && point.y >= 0)
         .forEach(point -> nearPoints.put(
-            point, Optional.ofNullable(world.getEntities().get(point))));
+            point, Optional.ofNullable(world.getEntitiesInWorld().get(point))));
         
         return nearPoints;
     }

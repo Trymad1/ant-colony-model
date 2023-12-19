@@ -1,11 +1,14 @@
 package App.Model.Entity.Ant;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import App.Model.World;
-import App.Util.EntityParams;
+import App.Model.Entity.Entity;
+import App.Util.Entities;
+import App.Util.EntityParams;   
 
 public class CollectorAnt extends Ant {
 
@@ -14,12 +17,19 @@ public class CollectorAnt extends Ant {
     }
     
     public CollectorAnt(World world) {
-        super(Color.DARK_GRAY, world);
+        super(EntityParams.Colors.ANT_COLLECTOR, world);
     }
 
     @Override
-    protected Point findWay() {
-        return null; // TODO
+    protected Optional<Point> findWay() {
+        Map<Point, Optional<Entity>> nearPoints = this.getNearPoints();
+        if (nearPoints.size() == 0) return Optional.ofNullable(null);
+
+        List<Point> emptyPoints = Entities.findEmptyPoint(nearPoints);
+        if (emptyPoints.size() == 0) return Optional.ofNullable(null);
+
+        int nextPosition = (int) (Math.random() * emptyPoints.size());
+        return Optional.of(new Point(emptyPoints.get(nextPosition)));
     }
 
 }

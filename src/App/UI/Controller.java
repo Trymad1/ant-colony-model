@@ -14,14 +14,32 @@ public class Controller {
         this.userInterface = ui;
         this.world = world;
 
-        userInterface.getStartButton().addActionListener(this::startButtonPressed);
+        userInterface.getStartButton().addActionListener(e -> {
+            try {
+                startButtonPressed(e);
+            } catch (InterruptedException ee) {
+                
+            }
+        });
         userInterface.getDeveloperInfo().addActionListener(this::aboutDeveloperPressed);
         userInterface.getAppInfo().addActionListener(this::aboutAppPressed);
     }
 
-    private void startButtonPressed(ActionEvent e) {
+    private void startButtonPressed(ActionEvent e) throws InterruptedException {
         world.createRandomWorld();
-        userInterface.getWorldPanel().repaint();
+        Runnable task = () -> {
+            while (true) {
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException exc) {
+                exc.printStackTrace();
+            }
+            world.update();
+            userInterface.getWorldPanel().repaint(); 
+            }
+        };
+        Thread thread = new Thread(task);
+        thread.start();
     }
 
     private void aboutDeveloperPressed(ActionEvent e) {

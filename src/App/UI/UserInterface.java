@@ -25,8 +25,6 @@ public class UserInterface extends JFrame {
 
     private final WorldPanel worldPanel;
 
-    private final Dimension worldSize;
-
     private final JPanel mainPanel, controllPanel, infoWorldPanel, viewWorldPanel,
                          antInfoPanel, colonyInfoPanel, emptyPanel;
 
@@ -102,9 +100,6 @@ public class UserInterface extends JFrame {
         
         worldPanel.setBackground(Color.WHITE);
         worldPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        
-        worldSize = new Dimension(worldPanel.getPreferredSize().width - 10, 
-                                  worldPanel.getPreferredSize().height - 10);
         
         setResizable(false);
         pack();

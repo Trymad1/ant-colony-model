@@ -23,6 +23,6 @@ public abstract class EntityParams {
 
         public static int ANTHILL = 3;
 
-        public static int FOOD = 1;
+        public static int FOOD = 2;
     }
 }

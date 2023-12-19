@@ -12,7 +12,7 @@ import App.Model.Updatable;
 import App.Model.World;
 import App.Model.Entity.Entity;
 
-public class WorldPanel extends JPanel implements Updatable{
+public class WorldPanel extends JPanel implements Updatable {
 
     private World world;
 
@@ -32,8 +32,7 @@ public class WorldPanel extends JPanel implements Updatable{
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;    
-        
-        Map<Point, Entity> entities = world.getEntities();
+        Map<Point, Entity> entities = world.getEntitiesInWorld();
         final Point nextPoint = new Point(0,0);
         entities.forEach((point, entity) -> {
             nextPoint.x = (point.x * SCALING) + WORLD_BOUND;
@@ -41,17 +40,13 @@ public class WorldPanel extends JPanel implements Updatable{
             g2d.setColor(entity.getColor());
             g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
         });
-
-        // TODO DEBUG
-        // for (Point iterable_element : entity.getNearPoints().keySet()) {
-        //     nextPoint.x = (iterable_element.x * SCALING) + WORLD_BOUND;
-        //     nextPoint.y = (iterable_element.y * SCALING) + WORLD_BOUND;
-        //     g2d.setColor(Color.RED);
-        //     g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
-        // }
-
-
     }
+    // for (Point iterable_element : entity.getNearPoints().keySet()) {
+    //     nextPoint.x = (iterable_element.x * SCALING) + WORLD_BOUND;
+    //     nextPoint.y = (iterable_element.y * SCALING) + WORLD_BOUND;
+    //     g2d.setColor(Color.RED);
+    //     g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
+    // }
 
     public void setWorld(World world) {
         this.world = world;

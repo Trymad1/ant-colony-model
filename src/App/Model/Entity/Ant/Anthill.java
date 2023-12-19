@@ -2,7 +2,7 @@ package App.Model.Entity.Ant;
 
 import java.awt.Point;
 import java.util.List;
-import java.util.Queue;
+import java.util.Optional;
 
 import App.Model.Updatable;
 import App.Model.World;
@@ -12,7 +12,6 @@ import App.Util.EntityParams;
 public class Anthill extends Entity implements Updatable {
 
     private float foodQuantity; 
-    
 
     public Anthill(Point point, World world) {
         super(EntityParams.Colors.ANTHILL, point, EntityParams.Sizes.ANTHILL, world);
@@ -26,13 +25,8 @@ public class Anthill extends Entity implements Updatable {
         return foodQuantity;
     }
 
-    public boolean putFood(Queue<Entity> food) {
-        if(food.peek().getColor().equals(EntityParams.Colors.FOOD)) {
-            food.poll();
-            return true;
-        } else {
-            return false;
-        }
+    public boolean putFood(Optional<Entity> food) {
+        return false; //TODO
     }
 
     public void clear() {
@@ -41,7 +35,6 @@ public class Anthill extends Entity implements Updatable {
 
     @Override
     public void update() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
+        
     }
 }
