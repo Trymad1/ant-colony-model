@@ -1,6 +1,7 @@
 package App.Util;
 
 import java.awt.Point;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -21,5 +22,32 @@ public abstract class Entities {
             .filter(entrySet -> entrySet.getValue().isPresent())
             .map(entrySet -> entrySet.getValue().get())
             .collect(Collectors.toList());
+    }
+
+    public static List<Point> getPointsForEntity(Point entityPoint, int size) {
+        final List<Point> entityPoints = new ArrayList<>();
+        final Point centeredPoint = new Point();
+        if (size > 1) {
+            int centeredX = size % 2 == 0 ?
+            entityPoint.x - ((size / 2) - 1) :
+            entityPoint.x - size / 2;
+            
+            int centeredY = size % 2 == 0 ?
+                entityPoint.y - ((size / 2) - 1) :
+                entityPoint.y - size / 2;
+            
+            centeredPoint.setLocation(centeredX, centeredY);
+            for (int i = centeredPoint.x; i < centeredPoint.x + size; i++) {
+                for (int j = centeredPoint.y; j < centeredPoint.y + size; j++) {
+                    entityPoints.add(new Point(i,j));
+                }
+            }
+
+        } else {
+            centeredPoint.setLocation(entityPoint);
+            entityPoints.add(centeredPoint);
+        }
+
+        return entityPoints;    
     }
 }

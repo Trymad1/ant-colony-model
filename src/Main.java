@@ -4,8 +4,6 @@ import App.Model.World;
 import App.UI.Controller;
 import App.UI.UserInterface;
 
-// 700 600
-
 public class Main {
     public static void main(String[] args) throws Exception {
         final UserInterface userInterface = 

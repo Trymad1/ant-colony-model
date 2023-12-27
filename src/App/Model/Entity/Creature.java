@@ -11,8 +11,6 @@ import App.Model.World;
 
 public abstract class Creature extends Entity implements Updatable, Movable {
 
-    protected HashMap<String, Point> memory;
-
     public Creature(Color color, int size, World world) {
         super(color, size, world);
     }

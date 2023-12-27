@@ -23,6 +23,21 @@ public abstract class EntityParams {
 
         public static int ANTHILL = 3;
 
-        public static int FOOD = 2;
+        public static int FOOD_SOURCE = 2;
+
+        public static int FOOD = 1;
+    }
+
+    public static class Names {
+
+        public static String ATHILL = "ANTHILL";
+
+        public static String ANT_COLLECTOR = "ANT_COLLECTOR";
+        
+        public static String ANT_SCOUT = "ANT_SCOUT";
+
+        public static String FOOD_SOURCE = "FOOD_SOURCE";
+
+        public static String FOOD = "FOOD";
     }
 }

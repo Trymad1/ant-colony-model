@@ -1,6 +1,7 @@
 package App.Model.Entity.Ant;
 
 import java.awt.Point;
+import java.lang.management.GarbageCollectorMXBean;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,19 +18,13 @@ public class CollectorAnt extends Ant {
     }
     
     public CollectorAnt(World world) {
-        super(EntityParams.Colors.ANT_COLLECTOR, world);
+        super(EntityParams.Colors.ANT_COLLECTOR, world);    
     }
 
     @Override
     protected Optional<Point> findWay() {
-        Map<Point, Optional<Entity>> nearPoints = this.getNearPoints();
-        if (nearPoints.size() == 0) return Optional.ofNullable(null);
-
-        List<Point> emptyPoints = Entities.findEmptyPoint(nearPoints);
-        if (emptyPoints.size() == 0) return Optional.ofNullable(null);
-
-        int nextPosition = (int) (Math.random() * emptyPoints.size());
-        return Optional.of(new Point(emptyPoints.get(nextPosition)));
+        return Optional.ofNullable(null);        
     }
+    
 
 }

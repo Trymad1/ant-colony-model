@@ -40,13 +40,13 @@ public class WorldPanel extends JPanel implements Updatable {
             g2d.setColor(entity.getColor());
             g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
         });
+        // for (Point iterable_element : entity.getNearPoints().keySet()) {
+        //     nextPoint.x = (iterable_element.x * SCALING) + WORLD_BOUND;
+        //     nextPoint.y = (iterable_element.y * SCALING) + WORLD_BOUND;
+        //     g2d.setColor(Color.RED);
+        //     g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
+        // }
     }
-    // for (Point iterable_element : entity.getNearPoints().keySet()) {
-    //     nextPoint.x = (iterable_element.x * SCALING) + WORLD_BOUND;
-    //     nextPoint.y = (iterable_element.y * SCALING) + WORLD_BOUND;
-    //     g2d.setColor(Color.RED);
-    //     g2d.fillRect(nextPoint.x, nextPoint.y, SCALING, SCALING);
-    // }
 
     public void setWorld(World world) {
         this.world = world;
