@@ -33,12 +33,14 @@ public class World {
 
     private Dimension worldSize;
 
-    public final int COLLECTORS_ON_CREATE = 10; // 30
+    public final int COLLECTORS_ON_CREATE = 30; // 30
     public final int FOOD_ON_CREATE = 7; // 5
     public final int SOLDIER_ON_CREATE = 0; // 20
 
     private final int DEFAULT_SIZE_WIDTH = 100;
     private final int DEFAULT_SIZE_HEIGHT = 100;
+
+    private final PheromoneUtil pheromoneUtil;
     
     public World() {
         
@@ -56,6 +58,8 @@ public class World {
         tempMap.put(PheromoneTypes.TO_TARGET, new HashMap<>());
         pheromones = Collections.unmodifiableMap(tempMap);
         
+        pheromoneUtil = new PheromoneUtil(pheromones);
+        
         anthill = new Anthill(this);
     }
     
@@ -66,10 +70,9 @@ public class World {
 
     public void update() {
         updatableObjects.stream().forEach(Updatable::update);
+        pheromoneUtil.update();
     }
 
-    
-    
     public void createRandomWorld() {
         
         List<Point> allPointsInWorld = 
@@ -78,8 +81,8 @@ public class World {
                 
         // Инициализация hashmap с феромонами
         allPointsInWorld.stream().forEach( point -> {
-            pheromones.get(PheromoneTypes.TO_ANTHILL).put(point, 0f);
-            pheromones.get(PheromoneTypes.TO_TARGET).put(point, 0f);
+            pheromones.get(PheromoneTypes.TO_ANTHILL).put(point, 0.200f);
+            pheromones.get(PheromoneTypes.TO_TARGET).put(point, 0.200f);
         });
 
         // Созданиме муравейника
@@ -217,6 +220,11 @@ public class World {
         pheromones.get(PheromoneTypes.TO_TARGET).clear();
     }
 
+    public void relocateEntity(Entity entity, Point point) {
+        entitiesInWorld.remove(entity.getPoint());
+        entitiesInWorld.put(point, entity);
+    }
+
     public Map<Point, Float> getSoldierPheromone() {
         return pheromones.get(PheromoneTypes.TO_TARGET);
     }
@@ -239,5 +247,9 @@ public class World {
 
     public Anthill getAnthill() {
         return anthill;
+    }
+
+    public PheromoneUtil getPheromoneUtil() {
+        return pheromoneUtil;
     }
 }

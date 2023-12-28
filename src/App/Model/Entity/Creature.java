@@ -21,9 +21,6 @@ public abstract class Creature extends Entity implements Updatable, Movable {
     
     @Override
     public void move(Point point) {
-        final Map<Point, Entity> entities = world.getEntitiesInWorld();
-        entities.remove(this.point);
-        entities.put(point, this);
-        this.point.setLocation(point);
+        setPoint(point);
     }
 }

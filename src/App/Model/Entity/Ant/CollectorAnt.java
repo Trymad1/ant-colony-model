@@ -1,15 +1,14 @@
 package App.Model.Entity.Ant;
 
 import java.awt.Point;
-import java.lang.management.GarbageCollectorMXBean;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import App.Model.World;
-import App.Model.Entity.Entity;
 import App.Util.Entities;
-import App.Util.EntityParams;   
+import App.Util.EntityParams;
+import App.Util.PheromoneTypes;   
 
 public class CollectorAnt extends Ant {
 
@@ -23,8 +22,14 @@ public class CollectorAnt extends Ant {
 
     @Override
     protected Optional<Point> findWay() {
-        return Optional.ofNullable(null);        
-    }
-    
+        List<Point> emptyPoint = Entities.findEmptyPoint(getNearPoints());
+        int random = (int) (Math.random() * emptyPoint.size());
+        if (emptyPoint.size() == 0) return Optional.ofNullable(null);
 
+        final PheromoneTypes type = takedItem.isPresent() ? 
+            PheromoneTypes.TO_TARGET : PheromoneTypes.TO_ANTHILL;
+        super.getPheromoneUtil().addPheromone(type, point);
+    
+        return Optional.of(emptyPoint.get(random));
+    }
 }

@@ -26,8 +26,8 @@ public class FoodSource extends Entity {
         }
 
         foodQuantity--;
-        if(foodQuantity == 0) world.addToRemoveEntity(this);
-        return new Food(world);
+        if(foodQuantity == 0) setToRemove();
+        return new Food();
     }       
 
     public boolean hasFood() {

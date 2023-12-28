@@ -5,6 +5,7 @@ import java.awt.Point;
 import java.util.Optional;
 
 import App.Model.CanTake;
+import App.Model.Item;
 import App.Model.World;
 import App.Model.Entity.Creature;
 import App.Model.Entity.Entity;
@@ -12,7 +13,7 @@ import App.Util.EntityParams;
 
 public abstract class Ant extends Creature implements CanTake {
 
-    protected Optional<Entity> takedItem;
+    protected Optional<Item> takedItem;
 
     public Ant(Color color, Point point, World world) {
         this(color, world);
@@ -21,6 +22,7 @@ public abstract class Ant extends Creature implements CanTake {
 
     public Ant(Color color, World world) {
         super(color, EntityParams.Sizes.ANT, world);
+        takedItem = Optional.ofNullable(null);
     }
 
     @Override

@@ -39,6 +39,7 @@ public class Controller {
             }
         };
         Thread thread = new Thread(task);
+        thread.setDaemon(true);
         thread.start();
     }
 

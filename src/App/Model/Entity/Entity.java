@@ -9,14 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import App.Model.PheromoneUtil;
 import App.Model.World;
 
 public abstract class Entity {
 
-    protected Color color;
+    protected final Color color;
     protected Point point;
     protected int size;
-    protected World world;
+    private World world;
 
     public Entity(Color color, int size, World world) {
         this.color = color;
@@ -69,6 +70,19 @@ public abstract class Entity {
         return nearPoints;
     }
 
+    protected PheromoneUtil getPheromoneUtil() {
+        return world.getPheromoneUtil();
+    }
+
+    public void setPoint(Point point) {
+        world.relocateEntity(this, point);
+        this.point = point;
+    }
+
+    public void setToRemove() {
+        world.addToRemoveEntity(this);
+    }
+
     public Color getColor() {
         return color;
     }
@@ -77,15 +91,8 @@ public abstract class Entity {
         return point;
     }
 
-    public void setColor(Color color) {
-        this.color = color; 
-    }
-
-    public void setPoint(Point point) {
-        this.point = point;
-    }
-
     public int getSize() {
         return size;
     }
+
 }
