@@ -2,8 +2,6 @@ package App.Model.Entity;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.util.HashMap;
-import java.util.Map;
 
 import App.Model.Movable;
 import App.Model.Updatable;

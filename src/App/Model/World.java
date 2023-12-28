@@ -22,7 +22,6 @@ import App.Util.Worlds;
 public class World {
 
     private final Map<Point, Entity> entitiesInWorld;
-    private final List<Entity> allEntities;
     private final List<Updatable> updatableObjects;
     private final Map<PheromoneTypes, Map<Point, Float>> pheromones;
     private final List<Point> areaForRandomSpawn;
@@ -30,6 +29,8 @@ public class World {
 
     private final Queue<Entity> toRemove;
     private final Queue<Entity> toCreate;
+
+    private final PheromoneUtil pheromoneUtil;
 
     private Dimension worldSize;
 
@@ -40,7 +41,6 @@ public class World {
     private final int DEFAULT_SIZE_WIDTH = 100;
     private final int DEFAULT_SIZE_HEIGHT = 100;
 
-    private final PheromoneUtil pheromoneUtil;
     
     public World() {
         
@@ -48,7 +48,6 @@ public class World {
         worldSize = new Dimension(DEFAULT_SIZE_WIDTH, DEFAULT_SIZE_HEIGHT);
         updatableObjects = new ArrayList<>();
         areaForRandomSpawn = new ArrayList<>();
-        allEntities = new ArrayList<>();
 
         toRemove = new ArrayDeque<>();
         toCreate = new ArrayDeque<>();
@@ -167,7 +166,6 @@ public class World {
         coord.forEach(emptyPoint -> {
             entitiesInWorld.put(emptyPoint, entity);
         });
-        allEntities.add(entity);
         if (entity instanceof Updatable) updatableObjects.add( (Updatable) entity);
 
         return entity;  
@@ -198,7 +196,6 @@ public class World {
             Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
         if(entity instanceof Updatable) updatableObjects.remove( (Updatable) entity);
         entityPoints.stream().forEach(point -> entitiesInWorld.remove(point));
-        allEntities.remove(entity);
         
         return entity;
     }

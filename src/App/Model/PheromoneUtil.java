@@ -1,7 +1,6 @@
 package App.Model;
 
 import java.awt.Point;
-import java.util.List;
 import java.util.Map;
 
 import App.Util.PheromoneTypes;
@@ -26,7 +25,6 @@ public class PheromoneUtil implements Updatable {
             pheromone.entrySet().stream()
             .forEach( entrySet -> {
                 if (entrySet.getValue() - TESTCONST < 0);
-                
                 // Округление число до 3-х знаков после запятой.
                 else pheromone.replace(entrySet.getKey(), 
                 (float) Math.round((entrySet.getValue() - TESTCONST) * 1000) / 1000 );
