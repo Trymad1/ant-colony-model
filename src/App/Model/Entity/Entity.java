@@ -11,23 +11,27 @@ import java.util.Optional;
 
 import App.Model.PheromoneUtil;
 import App.Model.World;
+import App.Util.EntityTypes;
 
 public abstract class Entity {
 
     protected final Color color;
     protected Point point;
     protected int size;
-    private World world;
 
-    public Entity(Color color, int size, World world) {
+    private World world;
+    private EntityTypes entityType;
+
+    public Entity(Color color, int size, World world, EntityTypes entityType) {
         this.color = color;
         this.size = size;
         this.world = world;
+        this.entityType = entityType;
         point = new Point();
     }
 
-    public Entity(Color color, Point point, int size, World world) {
-        this(color, size, world);
+    public Entity(Color color, Point point, int size, World world, EntityTypes entityType) {
+        this(color, size, world, entityType);
         this.point = point;
     }
 
@@ -65,7 +69,7 @@ public abstract class Entity {
         .filter(point -> (point.x < worldSize.width && point.x >= 0) &&
                           point.y < worldSize.height && point.y >= 0)
         .forEach(point -> nearPoints.put(
-            point, Optional.ofNullable(world.getEntitiesInWorld().get(point))));
+            point, Optional.ofNullable(world.getAllEntities().get(point))));
         
         return nearPoints;
     }
@@ -93,6 +97,10 @@ public abstract class Entity {
 
     public int getSize() {
         return size;
+    }
+
+    public EntityTypes getEntityType() {
+        return entityType;
     }
 
 }

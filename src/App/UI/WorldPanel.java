@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import App.Model.Updatable;
 import App.Model.World;
 import App.Model.Entity.Entity;
+import App.Util.EntityTypes;
 
 public class WorldPanel extends JPanel implements Updatable {
 
@@ -32,7 +33,7 @@ public class WorldPanel extends JPanel implements Updatable {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;    
-        Map<Point, Entity> entities = world.getEntitiesInWorld();
+        Map<Point, Entity> entities = world.getAllEntities();
         final Point nextPoint = new Point(0,0);
         entities.forEach((point, entity) -> {
             nextPoint.x = (point.x * SCALING) + WORLD_BOUND;

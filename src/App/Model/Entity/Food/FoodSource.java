@@ -7,17 +7,18 @@ import java.awt.Point;
 import App.Model.World;
 import App.Model.Entity.Entity;
 import App.Util.EntityParams;
+import App.Util.EntityTypes;
 
 public class FoodSource extends Entity {
 
     private int foodQuantity;
 
     public FoodSource(Point point, World world) {
-        super(Color.GREEN, point, EntityParams.Sizes.FOOD_SOURCE, world);
+        super(Color.GREEN, point, EntityParams.Sizes.FOOD_SOURCE, world, EntityTypes.OBJECT);
     }
     
     public FoodSource(World world) {
-        super(Color.GREEN, EntityParams.Sizes.FOOD_SOURCE, world);
+        super(Color.GREEN, EntityParams.Sizes.FOOD_SOURCE, world, EntityTypes.OBJECT);
     }
 
     public Food takeFood() {

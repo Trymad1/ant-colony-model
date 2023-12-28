@@ -11,21 +11,22 @@ import java.util.Map;
 import java.util.Queue;
 
 import App.Model.Entity.Entity;
+import App.Model.Entity.Ant.Ant;
 import App.Model.Entity.Ant.Anthill;
 import App.Model.Entity.Ant.CollectorAnt;
 import App.Model.Entity.Ant.SoldierAnt;
 import App.Model.Entity.Food.FoodSource;
 import App.Util.Entities;
+import App.Util.EntityTypes;
 import App.Util.PheromoneTypes;
 import App.Util.Worlds;
 
 public class World {
 
-    private final Map<Point, Entity> entitiesInWorld;
+    private final Map<EntityTypes, Map<Point, Entity>> entities;
     private final List<Updatable> updatableObjects;
     private final Map<PheromoneTypes, Map<Point, Float>> pheromones;
     private final List<Point> areaForRandomSpawn;
-    private final Anthill anthill;
 
     private final Queue<Entity> toRemove;
     private final Queue<Entity> toCreate;
@@ -44,7 +45,12 @@ public class World {
     
     public World() {
         
-        entitiesInWorld = new HashMap<>();
+        Map<EntityTypes, Map<Point, Entity>> tempEntities = new HashMap<>();
+        tempEntities.put(EntityTypes.ANTHILL, new HashMap<>());
+        tempEntities.put(EntityTypes.CREATURE, new HashMap<>());
+        tempEntities.put(EntityTypes.OBJECT, new HashMap<>());
+        entities = Collections.unmodifiableMap(tempEntities);
+        
         worldSize = new Dimension(DEFAULT_SIZE_WIDTH, DEFAULT_SIZE_HEIGHT);
         updatableObjects = new ArrayList<>();
         areaForRandomSpawn = new ArrayList<>();
@@ -52,14 +58,13 @@ public class World {
         toRemove = new ArrayDeque<>();
         toCreate = new ArrayDeque<>();
         
-        Map<PheromoneTypes, Map<Point, Float>> tempMap = new HashMap<>();
-        tempMap.put(PheromoneTypes.TO_ANTHILL, new HashMap<>());
-        tempMap.put(PheromoneTypes.TO_TARGET, new HashMap<>());
-        pheromones = Collections.unmodifiableMap(tempMap);
-        
+        Map<PheromoneTypes, Map<Point, Float>> tempPheromoneMap = new HashMap<>();
+        tempPheromoneMap.put(PheromoneTypes.TO_ANTHILL, new HashMap<>());
+        tempPheromoneMap.put(PheromoneTypes.TO_TARGET, new HashMap<>());
+        pheromones = Collections.unmodifiableMap(tempPheromoneMap);
+
         pheromoneUtil = new PheromoneUtil(pheromones);
         
-        anthill = new Anthill(this);
     }
     
     public World(Dimension worldSize) {
@@ -88,8 +93,7 @@ public class World {
         final Point anthillPoint = new Point(
             ((worldSize.width - 1) / 2),
             ((worldSize.height - 1) / 2));
-            anthill.setPoint(anthillPoint);
-            createEntity(anthill);
+            createEntity(new Anthill(anthillPoint, this));
             
         final Point pointNearAnthillA = 
             new Point((worldSize.width - 1) / 3, (worldSize.height - 1) / 3);
@@ -101,7 +105,7 @@ public class World {
             pointNearAnthillA, pointNearAnthillB);
         
         final List<Point> emptyPointsNearAnthill = Worlds.getEmptyPointFromArea(
-            pointsNearAnthill, entitiesInWorld);
+            pointsNearAnthill, this.getAllEntities());
         
         for (int i = 0; i < COLLECTORS_ON_CREATE; i++) {
             final Entity entity = randomSpawn(new CollectorAnt(this), emptyPointsNearAnthill);
@@ -122,7 +126,7 @@ public class World {
     
         // Случайное размещение еды в мире на определенном расстоянии от колонии
         final List<Point> emptyPointsForRespawn 
-            = Worlds.getEmptyPointFromArea(areaForRandomSpawn, entitiesInWorld);
+            = Worlds.getEmptyPointFromArea(areaForRandomSpawn, this.getAllEntities());
 
         for (int i = 0; i < FOOD_ON_CREATE; i++) {  
             final Entity entity = randomSpawn(new FoodSource(this), emptyPointsForRespawn);
@@ -164,8 +168,10 @@ public class World {
         List<Point> coord = Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
         if (isPossibleToCreate(coord) == false) return null;
         coord.forEach(emptyPoint -> {
-            entitiesInWorld.put(emptyPoint, entity);
+            final EntityTypes entityType = entity.getEntityType();
+            entities.get(entityType).put(emptyPoint, entity);
         });
+        
         if (entity instanceof Updatable) updatableObjects.add( (Updatable) entity);
 
         return entity;  
@@ -195,7 +201,9 @@ public class World {
         List<Point> entityPoints = 
             Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
         if(entity instanceof Updatable) updatableObjects.remove( (Updatable) entity);
-        entityPoints.stream().forEach(point -> entitiesInWorld.remove(point));
+        entityPoints.stream().forEach(point -> {
+            entities.get(entity.getEntityType()).remove(point);
+        });
         
         return entity;
     }
@@ -206,20 +214,19 @@ public class World {
         .anyMatch(point -> 
             (point.x >= 0 && point.y >= 0) &&
             !(point.x <= worldSize.width - 1 && point.y <= worldSize.height - 1) &&
-            (entitiesInWorld.get(point) != null));
+            (this.getAllEntities().get(point) != null));
         return !isNotEmptyCoord;
     }
     
     public void clearWorld() {
-        entitiesInWorld.clear();
         updatableObjects.clear();
         pheromones.get(PheromoneTypes.TO_ANTHILL).clear();
         pheromones.get(PheromoneTypes.TO_TARGET).clear();
     }
 
     public void relocateEntity(Entity entity, Point point) {
-        entitiesInWorld.remove(entity.getPoint());
-        entitiesInWorld.put(point, entity);
+        entities.get(entity.getEntityType()).remove(entity.getPoint());
+        entities.get(entity.getEntityType()).put(point, entity);
     }
 
     public Map<Point, Float> getSoldierPheromone() {
@@ -230,23 +237,36 @@ public class World {
         return pheromones.get(PheromoneTypes.TO_ANTHILL);
     }
 
+    public Map<Point, Entity> getAllEntities() {
+        final Map<Point, Entity> allEntities = new HashMap<>();
+
+        entities.values().stream()
+        .forEach(entitiesMap -> allEntities.putAll(entitiesMap));
+
+        return allEntities;
+    }
+
+    public Map<Point, Entity> getCreatures() {
+        return entities.get(EntityTypes.CREATURE);
+    }
+
+    public Map<Point, Entity> getObjects() {
+        return entities.get(EntityTypes.OBJECT);
+    }
+
+    public Anthill getAnthill() {
+        return (Anthill) entities.get(EntityTypes.ANTHILL).values().toArray()[0];
+    }   
+
     public Dimension getWorldSize() {
         return worldSize;
     }
 
-    public void setWorldSize(Dimension worldSize) {
-        this.worldSize = worldSize;
-    }
-
-    public Map<Point, Entity> getEntitiesInWorld() {
-        return entitiesInWorld;
-    }
-
-    public Anthill getAnthill() {
-        return anthill;
-    }
-
     public PheromoneUtil getPheromoneUtil() {
         return pheromoneUtil;
+    }
+
+    public void setWorldSize(Dimension worldSize) {
+        this.worldSize = worldSize;
     }
 }
