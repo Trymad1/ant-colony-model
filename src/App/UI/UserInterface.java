@@ -3,12 +3,14 @@ package App.UI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Frame;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -20,6 +22,7 @@ import javax.swing.SpinnerNumberModel;
 
 import App.Model.World;
 import App.Util.EntityParams;
+import App.Util.WorldPaintMode;
 
 public class UserInterface extends JFrame {
 
@@ -28,7 +31,7 @@ public class UserInterface extends JFrame {
     private final JPanel mainPanel, controllPanel, infoWorldPanel, viewWorldPanel,
                          antInfoPanel, colonyInfoPanel, emptyPanel;
 
-    private final JLabel colonyLabel, speedLabel;
+    private final JLabel colonyLabel, speedLabel, paintModeLabel;
 
     private final InfoLabel<Integer> antQuantityInfo, antCollectorsInfo, antSoldierInfo,
                                      antScoutInfo;
@@ -37,6 +40,8 @@ public class UserInterface extends JFrame {
     private final JButton startButton;
 
     private final JSpinner speedChooser;
+    
+    private final JComboBox<WorldPaintMode> paintModeComboBox;
 
     private final JMenuBar menuBar;
 
@@ -48,7 +53,7 @@ public class UserInterface extends JFrame {
     public UserInterface(Dimension size) {
 
         setSize(size);
-        setLayout(new FlowLayout(FlowLayout.CENTER));
+        setLayout(new FlowLayout(FlowLayout.LEFT));
         this.mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         add(mainPanel);
@@ -64,7 +69,8 @@ public class UserInterface extends JFrame {
         emptyPanel = new JPanel();
 
         colonyLabel = new JLabel("Муравейник", JLabel.CENTER);
-        speedLabel = new JLabel("Скорость: ");
+        speedLabel = new JLabel("Скорость:");
+        paintModeLabel = new JLabel("Режим:");
 
         startButton = new JButton("Старт");
         
@@ -76,6 +82,13 @@ public class UserInterface extends JFrame {
         antSoldierInfo = new InfoLabel<Integer>("Воинов:", 0, EntityParams.Colors.ANT_SOLDIER);
         antScoutInfo = new InfoLabel<Integer>("Разведчиков:", 0, EntityParams.Colors.ANT_SCOUT);
         colonyFoodInfo = new InfoLabel<Float>("Еда:", 0.0f);
+
+        paintModeComboBox = new JComboBox<>();
+        paintModeComboBox.addItem(WorldPaintMode.ALL_ENTITIES);
+        paintModeComboBox.addItem(WorldPaintMode.ONLY_CREATURE);
+        paintModeComboBox.addItem(WorldPaintMode.ONLY_OBJECTS);
+        paintModeComboBox.addItem(WorldPaintMode.PHEROMONE_TO_ANTHILL);
+        paintModeComboBox.addItem(WorldPaintMode.PHEROMONE_TO_TARGET);
 
         menuBar = new JMenuBar();
 
@@ -137,7 +150,7 @@ public class UserInterface extends JFrame {
       
         final Dimension controllPanelDimension = 
             new Dimension(viewWorldPanelDimension.width, 
-                        (int) (frameSize.height / 17));
+                        (int) (frameSize.height / 17)); 
 
         final Dimension startButtonDimension = 
             new Dimension((int) (controllPanelDimension.width / 4), 
@@ -147,11 +160,16 @@ public class UserInterface extends JFrame {
             new Dimension((int) (controllPanelDimension.width / 10), 
                           (int) (controllPanelDimension.height / 1.3));
 
+        final Dimension paintModeDimension = 
+            new Dimension( (int) (controllPanelDimension.width / 3), 
+                           (int) (controllPanelDimension.height / 1.3));
+
         worldPanel.setPreferredSize(worldPanelDimension);
         viewWorldPanel.setPreferredSize(viewWorldPanelDimension);
         controllPanel.setPreferredSize(controllPanelDimension);
         startButton.setPreferredSize(startButtonDimension);
         speedChooser.setPreferredSize(speedChooserDimension);
+        paintModeComboBox.setPreferredSize(paintModeDimension);
         infoWorldPanel.setPreferredSize(infoWorldPanelDimension);
         infoWorldPanel.setPreferredSize(infoWorldPanelDimension);
         antInfoPanel.setPreferredSize(antInfoPanelDimension);
@@ -203,9 +221,11 @@ public class UserInterface extends JFrame {
         infoWorldPanel.add(antInfoPanel);
         infoWorldPanel.add(colonyInfoPanel);
         
-        controllPanel.add(startButton);
+        controllPanel.add(paintModeLabel);
+        controllPanel.add(paintModeComboBox);
         controllPanel.add(speedLabel);
         controllPanel.add(speedChooser);
+        controllPanel.add(startButton);
 
         viewWorldPanel.add(worldPanel);
         viewWorldPanel.add(infoWorldPanel);
@@ -251,5 +271,9 @@ public class UserInterface extends JFrame {
 
     public WorldPanel getWorldPanel() {
         return worldPanel;
+    }
+
+    public JComboBox<WorldPaintMode> getPaintModeComboBox() {
+        return paintModeComboBox;
     }
 }

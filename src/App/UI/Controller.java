@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 
 import App.Model.World;
+import App.Util.WorldPaintMode;
 
 public class Controller {
     public final UserInterface userInterface;
@@ -27,14 +28,20 @@ public class Controller {
 
     private void startButtonPressed(ActionEvent e) throws InterruptedException {
         world.createRandomWorld();
+
         Runnable task = () -> {
+
             while (true) {
+
             try {
                 Thread.sleep(200);
             } catch (InterruptedException exc) {
                 exc.printStackTrace();
             }
             world.update();
+            final WorldPaintMode selectedPaintMode = 
+                (WorldPaintMode) userInterface.getPaintModeComboBox().getSelectedItem();
+            userInterface.getWorldPanel().setWorldPaintMode(selectedPaintMode);
             userInterface.getWorldPanel().repaint(); 
             }
         };

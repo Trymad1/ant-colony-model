@@ -3,13 +3,14 @@ package App.Model;
 import java.awt.Point;
 import java.util.Map;
 
+import App.Model.Entity.Pheromone.Pheromone;
 import App.Util.PheromoneTypes;
 
 public class PheromoneUtil implements Updatable {
 
-    private final Map<PheromoneTypes, Map<Point, Float>> pheromones;
+    private final Map<PheromoneTypes, Map<Point, Pheromone>> pheromones;
 
-    public PheromoneUtil(Map<PheromoneTypes, Map<Point, Float>> pheromones) {
+    public PheromoneUtil(Map<PheromoneTypes, Map<Point, Pheromone>> pheromones) {
         this.pheromones = pheromones;
     }
 
@@ -18,25 +19,19 @@ public class PheromoneUtil implements Updatable {
         evaporationPheromone();
     }
 
-    private static float TESTCONST = 0.001f;
+    private static float TESTCONST = 0.003f;
     // TOOD formula
     private void evaporationPheromone() {
-        for (Map<Point, Float> pheromone : pheromones.values()) {
-            pheromone.entrySet().stream()
-            .forEach( entrySet -> {
-                if (entrySet.getValue() - TESTCONST < 0);
-                // Округление число до 3-х знаков после запятой.
-                else pheromone.replace(entrySet.getKey(), 
-                (float) Math.round((entrySet.getValue() - TESTCONST) * 1000) / 1000 );
-            });
+        for (Map<Point, Pheromone> pheromones : this.pheromones.values()) {
+            pheromones.values().stream()
+            .forEach(pheromone -> pheromone.minusPheromone(TESTCONST));
         }
     }
 
     private static float ADD_VALUE = 0.05f;
     public void addPheromone(PheromoneTypes pheromoneType, Point point) {
-        Map<Point, Float> pheromoneMap = pheromones.get(pheromoneType);
-        pheromoneMap.replace(point, pheromoneMap.get(point) + ADD_VALUE);
-        // System.out.println(pheromoneMap.get(point));
+        Map<Point, Pheromone> pheromoneMap = pheromones.get(pheromoneType);
+        pheromoneMap.get(point).addPheromone(ADD_VALUE);
     }
     
 }
