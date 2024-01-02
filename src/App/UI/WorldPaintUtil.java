@@ -1,7 +1,8 @@
 package App.UI;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.List;
+
 import java.util.Map;
 import java.awt.Point;
 
@@ -25,9 +26,22 @@ public final class WorldPaintUtil {
 
     public Map<Point, Entity> getEntityListForDisplay(World world) {
         final Map<Point, Entity> entityList = new HashMap<>();
-        if(displayAnthill) entityList.putAll(world.getAnthill());
+
+        if(displayAnthill) entityList.putAll(world.getAnthill());  
         if(displayObjects) entityList.putAll(world.getObjects());
-        if(displayCreature) entityList.putAll(world.getCreatures());
+        
+        try {
+            if(displayCreature) entityList.putAll(world.getCreatures());
+        } catch (ConcurrentModificationException ignored) {
+            // TODO fix bug
+
+            // Очень редко в этом участке кода выбрасывается исключение, 
+            // из за чего на текущей итерации мира сущности категории
+            // creature не удается получить в полном составе. 
+            // Так же начинает часто выбрасываться, если
+            // поставить обновление мира в потоке 
+            // WorldThread класса Controller раньше отрисовки поля. 
+        }
 
         if(displayPheromoneToTarget) {
 

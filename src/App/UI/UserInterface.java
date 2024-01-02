@@ -53,7 +53,7 @@ public class UserInterface extends JFrame {
     public UserInterface(Dimension size) {
 
         setSize(size);
-        setLayout(new FlowLayout(FlowLayout.LEFT));
+        setLayout(new FlowLayout(FlowLayout.CENTER));
         this.mainPanel = new JPanel();
         mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
         add(mainPanel);
@@ -105,7 +105,7 @@ public class UserInterface extends JFrame {
         
         infoWorldPanel.setLayout(new BoxLayout(infoWorldPanel, BoxLayout.Y_AXIS));
         antInfoPanel.setLayout(new BoxLayout(antInfoPanel, BoxLayout.Y_AXIS));
-        controllPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+        controllPanel.setLayout(new FlowLayout());
         viewWorldPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
         
         calculateAndSetComponentsPrefferedSize(size);
@@ -114,7 +114,7 @@ public class UserInterface extends JFrame {
         worldPanel.setBackground(Color.WHITE);
         worldPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         
-        setResizable(false);
+        setResizable(true);
         pack();
         setVisible(true);
     }
@@ -220,7 +220,7 @@ public class UserInterface extends JFrame {
 
         infoWorldPanel.add(antInfoPanel);
         infoWorldPanel.add(colonyInfoPanel);
-        
+
         controllPanel.add(paintModeLabel);
         controllPanel.add(paintModeComboBox);
         controllPanel.add(speedLabel);

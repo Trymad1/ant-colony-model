@@ -11,7 +11,7 @@ public class Main {
         
         SwingUtilities.invokeLater( () -> {
             final UserInterface userInterface = 
-                new UserInterface(new Dimension(570,520));
+                new UserInterface(new Dimension(570,520)); // 520
 
             final World world = new World(new Dimension(100,100));
                 userInterface.setWorldForDisplay(world);

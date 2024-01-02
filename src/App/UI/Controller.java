@@ -8,46 +8,34 @@ import App.Model.World;
 import App.Util.WorldPaintMode;
 
 public class Controller {
+
     public final UserInterface userInterface;
     public final World world;
+    private final Thread worldThread;
+    public boolean isRunning;
 
     public Controller(UserInterface ui, World world) {
         this.userInterface = ui;
-        this.world = world;
+        this.world = world; 
+        isRunning = false;
 
-        userInterface.getStartButton().addActionListener(e -> {
-            try {
-                startButtonPressed(e);
-            } catch (InterruptedException ee) {
-                
-            }
-        });
+        userInterface.getStartButton().addActionListener(this::startButtonPressed);
         userInterface.getDeveloperInfo().addActionListener(this::aboutDeveloperPressed);
         userInterface.getAppInfo().addActionListener(this::aboutAppPressed);
+
+        worldThread = new Thread(new Controller.WorldThread());
+        worldThread.setDaemon(true);
+        worldThread.start();
     }
+    
+    private synchronized void startButtonPressed(ActionEvent e) {
+        if(!world.isCreated()) world.createRandomWorld();
 
-    private void startButtonPressed(ActionEvent e) throws InterruptedException {
-        world.createRandomWorld();
-
-        Runnable task = () -> {
-
-            while (true) {
-
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException exc) {
-                exc.printStackTrace();
-            }
-            world.update();
-            final WorldPaintMode selectedPaintMode = 
-                (WorldPaintMode) userInterface.getPaintModeComboBox().getSelectedItem();
-            userInterface.getWorldPanel().setWorldPaintMode(selectedPaintMode);
-            userInterface.getWorldPanel().repaint(); 
-            }
+        if(!isRunning) {    
+            isRunning = true;
+        } else {
+            isRunning = false;
         };
-        Thread thread = new Thread(task);
-        thread.setDaemon(true);
-        thread.start();
     }
 
     private void aboutDeveloperPressed(ActionEvent e) {
@@ -58,5 +46,30 @@ public class Controller {
         JOptionPane.showMessageDialog(userInterface, "Информация о приложении //TODO");
     }
 
+    private class WorldThread implements Runnable {
+
+        @Override
+        public void run() {
+            while (!Thread.currentThread().isInterrupted()) {
+                final WorldPaintMode selectedPaintMode = 
+                (WorldPaintMode) userInterface.getPaintModeComboBox().getSelectedItem();
+                userInterface.getWorldPanel().setWorldPaintMode(selectedPaintMode);
+                userInterface.getWorldPanel().repaint();
+
+                if (isRunning) {
+
+                    final int choosedSpeed = (int) userInterface.getSpeedChooser().getValue();
+                    final int delay = 1000 / (int) Math.pow(choosedSpeed, 3);
+                    
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                    }
+                    world.update();
+                }
+            }
+        }
+    }
 
 }

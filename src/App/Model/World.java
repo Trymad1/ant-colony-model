@@ -1,5 +1,6 @@
 package App.Model;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayDeque;
@@ -251,6 +252,15 @@ public class World {
     }
 
     public Map<Point, Entity> getCreatures() {
+        // final HashMap<Point, Entity> copyMap = new HashMap<>();
+        // // entities.get(EntityTypes.CREATURE).entrySet().stream()
+        // // .forEach( entrySet -> {
+        // //     final Entity entity = entrySet.getValue();
+        // //     final Entity copyEntity = 
+        // //         new Entity(entity.getColor(), entity.getPoint(), entity.getSize(),
+        // //         null, EntityTypes.CREATURE) {};
+        // //     copyMap.put(entrySet.getKey(), copyEntity);
+        // // });
         return entities.get(EntityTypes.CREATURE);
     }
 
@@ -261,6 +271,10 @@ public class World {
     public Map<Point, Entity> getAnthill() {
         return entities.get(EntityTypes.ANTHILL);
     }   
+
+    public boolean isCreated() {
+        return !entities.get(EntityTypes.ANTHILL).isEmpty();
+    }
 
     public Dimension getWorldSize() {
         return worldSize;

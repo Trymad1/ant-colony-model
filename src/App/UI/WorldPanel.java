@@ -44,10 +44,10 @@ public class WorldPanel extends JPanel implements Updatable {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2d = (Graphics2D) g;    
+        final Graphics2D g2d = (Graphics2D) g;    
         
         worldPaintUtil.setPaintMode(worldPaintMode);
-        Map<Point, Entity> entities =   
+        final Map<Point, Entity> entities =   
             worldPaintUtil.getEntityListForDisplay(world);
 
         final Point nextPoint = new Point(0,0);
