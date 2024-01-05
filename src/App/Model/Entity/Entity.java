@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import App.Model.PheromoneUtil;
 import App.Model.World;
+import App.Model.Entity.Pheromone.PheromoneUtil;
 import App.Util.EntityTypes;
 
 public abstract class Entity {
-
-    protected final Color color;
+    // todo
+    protected Color color;
     protected Point point;
     protected int size;
 

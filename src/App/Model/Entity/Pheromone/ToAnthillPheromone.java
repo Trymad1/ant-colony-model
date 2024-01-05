@@ -1,10 +1,8 @@
 package App.Model.Entity.Pheromone;
 
-import java.awt.Color;
 import java.awt.Point;
 
 import App.Model.World;
-import App.Util.Entities;
 import App.Util.EntityParams;
 import App.Util.EntityTypes;
 

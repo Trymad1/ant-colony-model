@@ -1,5 +1,6 @@
 package App.Util;
 
+import java.awt.Color;
 import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,5 +50,16 @@ public abstract class Entities {
         }
 
         return entityPoints;    
+    }
+
+    public static <T extends Entity> Optional<T> findTargetEntityNear(
+        Map<Point, Optional<Entity>> nearPoints, Color entityColor, Class<T> entityClass) {
+        List<Entity> nearEntity = Entities.findNearEntity(nearPoints);
+
+        return nearEntity.stream()
+        .filter(currentEntity -> 
+            currentEntity.getColor() == entityColor && entityClass.isInstance(currentEntity))
+        .map(entityClass::cast)
+        .findFirst();
     }
 }

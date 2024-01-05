@@ -18,7 +18,7 @@ public abstract class EntityParams {
 
         public static Color PHEROMONE_TO_ANTHILL = Color.BLUE;
 
-        public static Color PHEROMONE_TO_TARGET = Color.ORANGE;
+        public static Color PHEROMONE_TO_TARGET = Color.GRAY;
     }
 
     public static class Sizes {

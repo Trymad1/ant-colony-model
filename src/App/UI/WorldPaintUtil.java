@@ -33,13 +33,14 @@ public final class WorldPaintUtil {
         try {
             if(displayCreature) entityList.putAll(world.getCreatures());
         } catch (ConcurrentModificationException ignored) {
+            System.out.println("Bug");
             // TODO fix bug
 
             // Очень редко в этом участке кода выбрасывается исключение, 
             // из за чего на текущей итерации мира сущности категории
             // creature не удается получить в полном составе. 
             // Так же начинает часто выбрасываться, если
-            // поставить обновление мира в потоке 
+            // поставить метод обновления мира update() в потоке 
             // WorldThread класса Controller раньше отрисовки поля. 
         }
 

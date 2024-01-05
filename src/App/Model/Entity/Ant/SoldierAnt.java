@@ -22,7 +22,7 @@ public class SoldierAnt extends Ant {
     }
 
     @Override //TODO
-    protected Optional<Point> findWay() {
+    protected Optional<Point> findPointToMove() {
         Map<Point, Optional<Entity>> nearPoints = this.getNearPoints();
         if (nearPoints.size() == 0) return Optional.ofNullable(null);
 

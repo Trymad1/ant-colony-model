@@ -15,13 +15,15 @@ public class FoodSource extends Entity {
 
     public FoodSource(Point point, World world) {
         super(Color.GREEN, point, EntityParams.Sizes.FOOD_SOURCE, world, EntityTypes.OBJECT);
+        foodQuantity = 100000;
     }
     
     public FoodSource(World world) {
         super(Color.GREEN, EntityParams.Sizes.FOOD_SOURCE, world, EntityTypes.OBJECT);
+        foodQuantity = 100000;
     }
 
-    public Food takeFood() {
+    public Food getFood() {
         if (foodQuantity < 0) {
             throw new RuntimeException("No food in foodsource");
         }

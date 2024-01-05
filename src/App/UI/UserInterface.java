@@ -3,8 +3,9 @@ package App.UI;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.Frame;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;

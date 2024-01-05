@@ -5,6 +5,8 @@ import javax.swing.SwingUtilities;
 import App.Model.World;
 import App.UI.Controller;
 import App.UI.UserInterface;
+import App.Util.Directional;
+import App.Util.Directionals;
 
 public class Main {
     public static void main(String[] args) throws Exception {

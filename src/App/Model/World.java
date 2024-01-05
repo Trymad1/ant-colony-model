@@ -1,6 +1,5 @@
 package App.Model;
 
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.ArrayDeque;
@@ -17,6 +16,7 @@ import App.Model.Entity.Ant.CollectorAnt;
 import App.Model.Entity.Ant.SoldierAnt;
 import App.Model.Entity.Food.FoodSource;
 import App.Model.Entity.Pheromone.Pheromone;
+import App.Model.Entity.Pheromone.PheromoneUtil;
 import App.Model.Entity.Pheromone.ToAnthillPheromone;
 import App.Model.Entity.Pheromone.ToTargetPheromone;
 import App.Util.Entities;
@@ -39,7 +39,7 @@ public class World {
     private Dimension worldSize;
 
     public final int COLLECTORS_ON_CREATE = 30; // 30
-    public final int FOOD_ON_CREATE = 7; // 5
+    public final int FOOD_ON_CREATE = 20; // 5
     public final int SOLDIER_ON_CREATE = 0; // 20
 
     private final int DEFAULT_SIZE_WIDTH = 100;
@@ -98,8 +98,15 @@ public class World {
             ((worldSize.height - 1) / 2));
             createEntity(new Anthill(anthillPoint, this));
             
+        final Point antSpawnAreaA = 
+            new Point((worldSize.width - 10) / 2, (worldSize.height -10) / 2);
+
+        final Point antSpawnAreaB 
+            = new Point((worldSize.width - 1) - antSpawnAreaA.x, 
+                        (worldSize.height - 1) - antSpawnAreaA.y); 
+
         final Point pointNearAnthillA = 
-            new Point((worldSize.width - 1) / 3, (worldSize.height - 1) / 3);
+            new Point((worldSize.width - 1) / 3, (worldSize.height -1) / 3);
 
         final Point pointNearAnthillB 
             = new Point((worldSize.width - 1) - pointNearAnthillA.x, 
@@ -110,10 +117,13 @@ public class World {
         
         final List<Point> emptyPointsNearAnthill = Worlds.getEmptyPointFromArea(
             pointsNearAnthill, this.getAllEntities());
+
+        final List<Point> emptyPointsForAnt = Worlds.getEmptyPointFromArea(
+            Worlds.getArea(antSpawnAreaA, antSpawnAreaB), this.getAllEntities());
         
         for (int i = 0; i < COLLECTORS_ON_CREATE; i++) {
-            final Entity entity = randomSpawn(new CollectorAnt(this), emptyPointsNearAnthill);
-            if(entity != null) emptyPointsNearAnthill.removeAll(
+            final Entity entity = randomSpawn(new CollectorAnt(this), emptyPointsForAnt);
+            if(entity != null) emptyPointsForAnt.removeAll(
                 Entities.getPointsForEntity(entity.getPoint(), entity.getSize()));
         }
 
@@ -252,15 +262,6 @@ public class World {
     }
 
     public Map<Point, Entity> getCreatures() {
-        // final HashMap<Point, Entity> copyMap = new HashMap<>();
-        // // entities.get(EntityTypes.CREATURE).entrySet().stream()
-        // // .forEach( entrySet -> {
-        // //     final Entity entity = entrySet.getValue();
-        // //     final Entity copyEntity = 
-        // //         new Entity(entity.getColor(), entity.getPoint(), entity.getSize(),
-        // //         null, EntityTypes.CREATURE) {};
-        // //     copyMap.put(entrySet.getKey(), copyEntity);
-        // // });
         return entities.get(EntityTypes.CREATURE);
     }
 

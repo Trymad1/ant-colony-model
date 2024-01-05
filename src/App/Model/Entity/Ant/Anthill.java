@@ -1,11 +1,11 @@
 package App.Model.Entity.Ant;
 
 import java.awt.Point;
-import java.util.Optional;
 
 import App.Model.Updatable;
 import App.Model.World;
 import App.Model.Entity.Entity;
+import App.Model.Entity.Food.Food;
 import App.Util.EntityParams;
 import App.Util.EntityTypes;
 
@@ -25,8 +25,8 @@ public class Anthill extends Entity implements Updatable {
         return foodQuantity;
     }
 
-    public boolean putFood(Optional<Entity> food) {
-        return false; //TODO
+    public void putFood(Food food) {
+        foodQuantity += food.getFoodValue();
     }
 
     public void clear() {

@@ -4,9 +4,9 @@ import App.Model.Item;
 
 public class Food implements Item {
 
-    private int foodValue;
+    private float foodValue;
 
-    public int getFoodValue() {
+    public float getFoodValue() {
         return foodValue;
     }
 }
