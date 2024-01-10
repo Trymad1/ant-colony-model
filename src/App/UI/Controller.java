@@ -1,37 +1,49 @@
 package App.UI;
 
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JOptionPane;
 
 import App.Model.World;
 import App.Model.Entity.Ant.Anthill;
+import App.Util.Setting;
 import App.Util.WorldPaintMode;
+import App.Util.Setting.SettingBuilder;
 
 public class Controller {
 
     public final UserInterface userInterface;
-    public final World world;
+    private final SettingWindow settingWindow;
+    public World world;
     private final Thread worldThread;
-    public boolean isRunning;
-    public boolean isClosed;
+    private boolean isRunning;
+    private boolean isReset;
+    
 
     public Controller(UserInterface ui, World world) {
         this.userInterface = ui;
-        this.world = world; 
+        this.world = world;
+        this.settingWindow = new SettingWindow(userInterface, SettingBuilder.createDefaultSetting()); 
         isRunning = false;
-        isClosed = false;
+        isReset = false;
 
         userInterface.getStartButton().addActionListener(this::startButtonPressed);
         userInterface.getDeveloperInfo().addActionListener(this::aboutDeveloperPressed);
+        userInterface.getReset().addActionListener(this::resetPressed);
         userInterface.getAppInfo().addActionListener(this::aboutAppPressed);
+        userInterface.getSetting().addActionListener(this::settingPressed);
 
         worldThread = new Thread(new Controller.WorldThread());
         worldThread.start();
+
     }
     
     private void startButtonPressed(ActionEvent e) {
-        if(!world.isCreated()) world.createRandomWorld();
+        if(!world.isCreated()) {
+            world.setSetting(settingWindow.getSetting());
+            world.createRandomWorld();
+        }
 
         if(!isRunning) {    
             isRunning = true;
@@ -50,11 +62,32 @@ public class Controller {
         JOptionPane.showMessageDialog(userInterface, "Информация о приложении //TODO");
     }
 
+    private void resetPressed(ActionEvent e) {
+        isReset = true;
+        isRunning = false;
+        userInterface.getStartButton().setText("Старт");
+    }
+
+    
+    private void settingPressed(ActionEvent e) {
+        if (!settingWindow.isVisible()) {
+            settingWindow.setVisible(true);
+        } else {
+            settingWindow.setVisible(false);
+        }
+    }
+
     private class WorldThread implements Runnable {
 
         @Override
         public void run() {
             while (!Thread.currentThread().isInterrupted()) {
+                if (isReset) {
+                    world.clearWorld();
+                    isReset = false;
+                    userInterface.resetInfoLabels();
+                    continue;
+                }
                 final WorldPaintMode selectedPaintMode = 
                 (WorldPaintMode) userInterface.getPaintModeComboBox().getSelectedItem();
                 userInterface.getWorldPanel().setWorldPaintMode(selectedPaintMode);

@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "InputWindow",
+            "request": "launch",
+            "mainClass": "App.UI.InputWindow",
+            "projectName": "AntColony_44a972a"
+        },
+        {
+            "type": "java",
+            "name": "InputWindow",
+            "request": "launch",
+            "mainClass": "InputWindow",
+            "projectName": "AntColony_44a972a"
+        },
+        {
+            "type": "java",
             "name": "Current File",
             "request": "launch",
             "mainClass": "${file}"

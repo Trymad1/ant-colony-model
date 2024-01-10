@@ -25,7 +25,9 @@ import App.Util.Entities;
 import App.Util.EntityParams;
 import App.Util.EntityTypes;
 import App.Util.PheromoneTypes;
+import App.Util.Setting;
 import App.Util.Worlds;
+import App.Util.Setting.SettingBuilder;
 
 public class World implements Updatable {
 
@@ -35,22 +37,21 @@ public class World implements Updatable {
     private final List<Point> areaForRandomSpawn;
 
     private final Queue<Entity> toRemove;
-    private final Queue<Entity> toCreate;
 
     private final PheromoneUtil pheromoneUtil;
 
     private Dimension worldSize;
 
-    public final int COLLECTORS_ON_CREATE = 30; // 30
-    public final int FOOD_ON_CREATE = 7; // 5
-    public final int SOLDIER_ON_CREATE = 0; // 20
-
     private final int DEFAULT_SIZE_WIDTH = 100;
     private final int DEFAULT_SIZE_HEIGHT = 100;
 
+    private Setting setting;
+
     
     public World() {
-        
+
+        this.setting = SettingBuilder.createDefaultSetting();
+
         Map<EntityTypes, Map<Point, Entity>> tempEntities = new HashMap<>();
         tempEntities.put(EntityTypes.ANTHILL, new HashMap<>());
         tempEntities.put(EntityTypes.CREATURE, new HashMap<>());
@@ -62,7 +63,6 @@ public class World implements Updatable {
         areaForRandomSpawn = new ArrayList<>();
 
         toRemove = new ArrayDeque<>();
-        toCreate = new ArrayDeque<>();
         
         Map<PheromoneTypes, Map<Point, Pheromone>> tempPheromoneMap = new HashMap<>();
         tempPheromoneMap.put(PheromoneTypes.TO_ANTHILL, new HashMap<>());
@@ -104,7 +104,8 @@ public class World implements Updatable {
         final Point anthillPoint = new Point(
             ((worldSize.width - 1) / 2),
             ((worldSize.height - 1) / 2));
-            createEntity(new Anthill(anthillPoint, this));
+            createEntity(new Anthill(
+                anthillPoint, this, setting.getStartFoodValue(), setting.getFoodConsumption()));
 
         final Point pointNearAnthillA = 
             new Point((worldSize.width - 1) / 3, (worldSize.height -1) / 3);
@@ -112,11 +113,11 @@ public class World implements Updatable {
         final Point pointNearAnthillB 
             = new Point((worldSize.width - 1) - pointNearAnthillA.x, 
                         (worldSize.height - 1) - pointNearAnthillA.y); 
-        // Создание и размещение муравьев около муравейника.
+        // Создание и размещение муравьев
         final List<Point> pointsNearAnthill = Worlds.getArea(
             pointNearAnthillA, pointNearAnthillB);
         
-        for (int i = 0; i < COLLECTORS_ON_CREATE; i++) {
+        for (int i = 0; i < setting.getAntQuant(); i++) {
             final Entity entity = createEntity(new CollectorAnt(this));
             entities.get(EntityTypes.ANTHILL).values().forEach(
                 element -> {
@@ -135,8 +136,8 @@ public class World implements Updatable {
         final List<Point> emptyPointsForRespawn 
             = Worlds.getEmptyPointFromArea(areaForRandomSpawn, this.getAllEntities());
 
-        for (int i = 0; i < FOOD_ON_CREATE; i++) {  
-            final Entity entity = randomSpawn(new FoodSource(this), emptyPointsForRespawn);
+        for (int i = 0; i < setting.getFoodSourceQuant(); i++) {  
+            final Entity entity = randomSpawn(new FoodSource(this, setting.getFoodInSourceQuant()), emptyPointsForRespawn);
             if(entity != null) emptyPointsForRespawn.removeAll(
                 Entities.getPointsForEntity(entity.getPoint(), entity.getSize()));
         }
@@ -168,22 +169,25 @@ public class World implements Updatable {
         return entity;
     }
 
-    private final int MINIMUM_QUANT_FOODSOURCE_FOR_SPAWN = 6 * EntityParams.Sizes.FOOD_SOURCE;
     private final int ATTEMP_TO_RANDOM_SPAWN = 10;
     
     private void randomSpawnInWorld() {
+        int minimumFoodSourceForSpawn = (setting.getFoodSourceQuant() / 2) >= 1 ?
+        (setting.getFoodSourceQuant() / 2) * EntityParams.Sizes.FOOD_SOURCE :
+        1 * EntityParams.Sizes.FOOD_SOURCE;
+
         final List<Entity> foodSource = 
             entities.get(EntityTypes.OBJECT).values().stream()
             .filter(entity -> entity instanceof FoodSource)
             .collect(Collectors.toList());
-        if (foodSource.size() > MINIMUM_QUANT_FOODSOURCE_FOR_SPAWN) {
+        if (foodSource.size() > minimumFoodSourceForSpawn) {
             return;
         }
 
         Entity newFoodSource = null;
         int attempCounter = 0;
         while (newFoodSource == null && attempCounter <= ATTEMP_TO_RANDOM_SPAWN) {
-            newFoodSource = randomSpawn(new FoodSource(this), 
+            newFoodSource = randomSpawn(new FoodSource(this, setting.getFoodInSourceQuant()), 
                        Worlds.getEmptyPointFromArea(areaForRandomSpawn, getAllEntities()));
             attempCounter++;
         }
@@ -216,11 +220,6 @@ public class World implements Updatable {
         }
     }
 
-    public void addToCreateEntity(Entity entity) {
-        toCreate.add(entity);
-    }
-
-
     private Entity removeEntity(Entity entity) {
         List<Point> entityPoints = 
             Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
@@ -242,11 +241,13 @@ public class World implements Updatable {
         return !isNotEmptyCoord;
     }
     
-    // TODO CLEAR ENTITIES
     public void clearWorld() {
         updatableObjects.clear();
         pheromones.get(PheromoneTypes.TO_ANTHILL).clear();
         pheromones.get(PheromoneTypes.TO_TARGET).clear();
+        
+        entities.values().forEach(Map::clear);
+        toRemove.clear();
     }
 
     public void relocateEntity(Entity entity, Point point) {
@@ -327,5 +328,9 @@ public class World implements Updatable {
 
     public void setWorldSize(Dimension worldSize) {
         this.worldSize = worldSize;
+    }
+
+    public void setSetting(Setting setting) {
+        this.setting = setting;
     }
 }

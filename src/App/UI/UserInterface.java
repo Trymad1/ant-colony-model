@@ -48,10 +48,10 @@ public class UserInterface extends JFrame {
 
     private final JMenuBar menuBar;
 
-    private final JMenu info, file;
+    private final JMenu info, controll;
 
-    private final JMenuItem developerInfo, appInfo, loadModel, 
-                            saveModel, exit, reset;
+    private final JMenuItem developerInfo, appInfo, exit, setting, reset;
+    
 
     public UserInterface(Dimension size) {
 
@@ -99,15 +99,14 @@ public class UserInterface extends JFrame {
         menuBar = new JMenuBar();
 
         info = new JMenu("Справка");
-        file = new JMenu("Файл");
+        controll = new JMenu("Управление");
     
         developerInfo = new JMenuItem("Разработчик");
         appInfo = new JMenuItem("О приложении");
 
-        loadModel = new JMenuItem("Загрузить");
-        saveModel = new JMenuItem("Сохранить");
         reset = new JMenuItem("Сбросить");
         exit = new JMenuItem("Выход");
+        setting = new JMenuItem("Настройки");
         
         infoWorldPanel.setLayout(new BoxLayout(infoWorldPanel, BoxLayout.Y_AXIS));
         antInfoPanel.setLayout(new BoxLayout(antInfoPanel, BoxLayout.Y_AXIS));
@@ -120,6 +119,7 @@ public class UserInterface extends JFrame {
         worldPanel.setBackground(Color.WHITE);
         worldPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
 
+        setLocationRelativeTo(null);
         setResizable(false);
         pack();
         setVisible(true);
@@ -200,12 +200,11 @@ public class UserInterface extends JFrame {
 
     private void addComponentsInFrame(final Frame frame) {
 
-        file.add(loadModel);
-        file.add(saveModel);
-        file.add(reset);
-        file.addSeparator();
-        file.add(exit);
-        menuBar.add(file);
+        controll.add(setting);
+        controll.add(reset);
+        controll.addSeparator();
+        controll.add(exit);
+        menuBar.add(controll);
 
         setJMenuBar(menuBar);
         info.add(developerInfo);
@@ -237,6 +236,14 @@ public class UserInterface extends JFrame {
         viewWorldPanel.add(infoWorldPanel);
         mainPanel.add(viewWorldPanel);
         mainPanel.add(controllPanel);
+    }
+
+    public void resetInfoLabels() {
+        antQuantityInfo.setValue(0);
+        antWithFood.setValue(0);
+        antWithoutFood.setValue(0);
+        colonyFoodInfo.setValue(0f);
+        foodConsumption.setValue(0f);
     }
     
     public JMenuItem getDeveloperInfo() {
@@ -279,20 +286,16 @@ public class UserInterface extends JFrame {
         return speedChooser;
     }
 
-    public JMenuItem getSaveModel() {
-        return saveModel;
-    }
-
-    public JMenuItem getLoadModel() {
-        return loadModel;
-    }
-
     public JMenuItem getExit() {
         return exit;
     }
 
     public JMenuItem getReset() {
         return reset;
+    }
+    
+    public JMenuItem getSetting() {
+        return setting;
     }
 
     public WorldPanel getWorldPanel() {

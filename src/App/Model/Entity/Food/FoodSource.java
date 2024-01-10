@@ -13,9 +13,19 @@ public class FoodSource extends Entity {
 
     private int foodQuantity;
 
+    public FoodSource(Point point, World world, int foodQuantity) {   
+        super(Color.GREEN, point, EntityParams.Sizes.FOOD_SOURCE, world, EntityTypes.OBJECT);
+        this.foodQuantity = foodQuantity;
+    }
+
     public FoodSource(Point point, World world) {   
         super(Color.GREEN, point, EntityParams.Sizes.FOOD_SOURCE, world, EntityTypes.OBJECT);
         foodQuantity = 100;
+    }
+
+    public FoodSource(World world, int foodQuantity) {
+        super(Color.GREEN, EntityParams.Sizes.FOOD_SOURCE, world, EntityTypes.OBJECT);
+        this.foodQuantity = foodQuantity;
     }
     
     public FoodSource(World world) {

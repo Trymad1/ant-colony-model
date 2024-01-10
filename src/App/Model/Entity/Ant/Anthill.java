@@ -19,10 +19,12 @@ public class Anthill extends Entity implements Updatable {
     private float foodQuantity; 
     private final Deque<Ant> ants;
     private float foodConsumption;
+    private float foodConsumptionCoeff;
 
-    public Anthill(Point point, World world) {
+    public Anthill(Point point, World world, float foodQuantity, float foodConsuptionCoeff) {
         super(EntityParams.Colors.ANTHILL, point, EntityParams.Sizes.ANTHILL, world, EntityTypes.ANTHILL);
-        this.foodQuantity = 100;
+        this.foodQuantity = foodQuantity;
+        this.foodConsumptionCoeff = foodConsuptionCoeff;
         ants = new ArrayDeque<>();
     }
 
@@ -53,7 +55,7 @@ public class Anthill extends Entity implements Updatable {
     }
 
     public void foodConsum(int antQuantity) {
-        foodConsumption = 0.004f * antQuantity;
+        foodConsumption = foodConsumptionCoeff * antQuantity;
         foodQuantity -= foodConsumption;
         if (foodQuantity < 0) {
             foodQuantity = 0;
