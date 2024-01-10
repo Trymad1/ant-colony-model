@@ -29,7 +29,10 @@ public class InfoLabel <T extends Number> extends JPanel {
 
     public void setValue(T value) {
         this.value = value;
-        System.out.println(this.value);
+        if(value instanceof Float) {
+            valueLabel.setText(String.format("%.2f", value));
+            return;
+        }
         valueLabel.setText(String.valueOf(value));
     }
 

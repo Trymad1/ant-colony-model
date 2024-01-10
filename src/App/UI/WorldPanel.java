@@ -11,10 +11,10 @@ import java.util.Map;
 
 import javax.swing.JPanel;
 
-import App.Model.Updatable;
 import App.Model.World;
 import App.Model.Entity.Entity;
 import App.Model.Entity.Pheromone.Pheromone;
+import App.Model.Interface.Updatable;
 import App.Util.WorldPaintMode;
 
 public class WorldPanel extends JPanel implements Updatable {
@@ -56,11 +56,13 @@ public class WorldPanel extends JPanel implements Updatable {
         entities.forEach((point, entity) -> {
             if(entity instanceof Pheromone) {
                 final Pheromone pheromone = (Pheromone) entity;
-                final float alphaValue = 
-                    (int) pheromone.getPheromoneValue() >= 1 ? 1f : pheromone.getPheromoneValue();
+                float alphaValue = 0;
+                if (pheromone.getPheromoneValue() > 0) {
+                    alphaValue = 1 / ((float)pheromone.getPheromoneValue() / 3) > 1 ?
+                    1f :  (float) 1 / ((float)pheromone.getPheromoneValue() / 3);
+                } else return;
+                    
                 g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alphaValue));
-
-
             }
             nextPoint.x = (point.x * SCALING) + WORLD_BOUND;
             nextPoint.y = (point.y * SCALING) + WORLD_BOUND;

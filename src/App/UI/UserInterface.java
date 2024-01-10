@@ -6,6 +6,8 @@ import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -34,9 +36,9 @@ public class UserInterface extends JFrame {
 
     private final JLabel colonyLabel, speedLabel, paintModeLabel;
 
-    private final InfoLabel<Integer> antQuantityInfo, antCollectorsInfo, antSoldierInfo,
-                                     antScoutInfo;
-    private final InfoLabel<Float> colonyFoodInfo;
+    private final InfoLabel<Integer> antQuantityInfo, antWithoutFood, antWithFood;
+
+    private final InfoLabel<Float> colonyFoodInfo, foodConsumption;
 
     private final JButton startButton;
 
@@ -60,6 +62,7 @@ public class UserInterface extends JFrame {
         add(mainPanel);
         setIconImage(new ImageIcon(getClass().getResource("ant.png")).getImage());
         setTitle("Моделирование жизни в муравейнике");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         worldPanel = new WorldPanel();
         controllPanel = new JPanel();
@@ -79,10 +82,12 @@ public class UserInterface extends JFrame {
             new SpinnerNumberModel(1,1,10,1)); 
 
         antQuantityInfo = new InfoLabel<Integer>("Всего муравьев:", 0);
-        antCollectorsInfo = new InfoLabel<Integer>("Собирателей:", 0, EntityParams.Colors.ANT_COLLECTOR);
-        antSoldierInfo = new InfoLabel<Integer>("Воинов:", 0, EntityParams.Colors.ANT_SOLDIER);
-        antScoutInfo = new InfoLabel<Integer>("Разведчиков:", 0, EntityParams.Colors.ANT_SCOUT);
+        antWithoutFood = new InfoLabel<Integer>("Без еды:", 0, EntityParams.Colors.ANT_COLLECTOR);
+        antWithFood = new InfoLabel<Integer>("С едой", 0, EntityParams.Colors.FOOD);
+        // antSoldierInfo = new InfoLabel<Integer>("Воинов:", 0, EntityParams.Colors.ANT_SOLDIER);
+        // antScoutInfo = new InfoLabel<Integer>("Разведчиков:", 0, EntityParams.Colors.ANT_SCOUT);
         colonyFoodInfo = new InfoLabel<Float>("Еда:", 0.0f);
+        foodConsumption = new InfoLabel<Float>("Потребление: ", 0f);
 
         paintModeComboBox = new JComboBox<>();
         paintModeComboBox.addItem(WorldPaintMode.ALL_ENTITIES);
@@ -114,8 +119,8 @@ public class UserInterface extends JFrame {
         
         worldPanel.setBackground(Color.WHITE);
         worldPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        
-        setResizable(true);
+
+        setResizable(false);
         pack();
         setVisible(true);
     }
@@ -126,8 +131,6 @@ public class UserInterface extends JFrame {
                           (int) (frameSize.height / 1.6));
 
         final Dimension worldPanelDimension = 
-            // new Dimension((int) (viewWorldPanelDimension.width / 1.6), 
-            //               (int) (viewWorldPanelDimension.height / 1.05));
             new Dimension(310,310);
 
         final Dimension infoWorldPanelDimension = 
@@ -178,12 +181,12 @@ public class UserInterface extends JFrame {
         antInfoPanel.setMinimumSize(antInfoPanelDimension);
         antQuantityInfo.setPreferredSize(antLabelDimension);
         antQuantityInfo.setMaximumSize(antLabelDimension);
-        antCollectorsInfo.setPreferredSize(antLabelDimension);
-        antCollectorsInfo.setMaximumSize(antLabelDimension);
-        antSoldierInfo.setPreferredSize(antLabelDimension);
-        antSoldierInfo.setMaximumSize(antLabelDimension);
-        antScoutInfo.setPreferredSize(antLabelDimension);
-        antScoutInfo.setMaximumSize(antLabelDimension);
+        antWithoutFood.setPreferredSize(antLabelDimension);
+        antWithoutFood.setMaximumSize(antLabelDimension);
+        antWithFood.setPreferredSize(antLabelDimension);
+        antWithFood.setMaximumSize(antLabelDimension);
+        foodConsumption.setPreferredSize(antLabelDimension);
+        foodConsumption.setMaximumSize(antLabelDimension);
         emptyPanel.setPreferredSize(emptyPanelDimension);
         emptyPanel.setMaximumSize(emptyPanelDimension);
         colonyInfoPanel.setPreferredSize(colonyPanelDimension);
@@ -212,12 +215,14 @@ public class UserInterface extends JFrame {
         antInfoPanel.add(antQuantityInfo);
         
         antInfoPanel.add(emptyPanel);
-        antInfoPanel.add(antCollectorsInfo);
-        antInfoPanel.add(antSoldierInfo);
-        antInfoPanel.add(antScoutInfo);
+        antInfoPanel.add(antWithoutFood);
+        antInfoPanel.add(antWithFood);
+        // antInfoPanel.add(antSoldierInfo);
+        // antInfoPanel.add(antScoutInfo);
 
         colonyInfoPanel.add(colonyLabel);
         colonyInfoPanel.add(colonyFoodInfo);
+        colonyInfoPanel.add(foodConsumption);
 
         infoWorldPanel.add(antInfoPanel);
         infoWorldPanel.add(colonyInfoPanel);
@@ -244,6 +249,26 @@ public class UserInterface extends JFrame {
 
     public void setWorldForDisplay(World world) {
         worldPanel.setWorld(world);
+    }
+
+    public void setAntQuant(int quant) {
+        this.antQuantityInfo.setValue(quant);
+    }
+
+    public void setAntWithFood(int quant) {
+        this.antWithFood.setValue(quant);
+    }
+
+    public void setAntWithoutFood(int quant) {
+        this.antWithoutFood.setValue(quant);
+    }
+
+    public void setAnthillFood(float quant) {
+        this.colonyFoodInfo.setValue(quant);
+    }
+
+    public void setFoodConsumption(float quant) {
+        this.foodConsumption.setValue(quant);
     }
 
     public JButton getStartButton() {

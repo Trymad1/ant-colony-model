@@ -1,4 +1,4 @@
-package App.Model;
+package App.Model.Interface;
 
 import java.awt.Point;
 

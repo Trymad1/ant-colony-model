@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import App.Model.Updatable;
+import App.Model.Interface.Updatable;
 import App.Util.PheromoneTypes;
 
 public class PheromoneUtil implements Updatable {
@@ -23,19 +23,13 @@ public class PheromoneUtil implements Updatable {
     // TOOD formula
     private void evaporationPheromone() {
         for (Map<Point, Pheromone> pheromones : this.pheromones.values()) {
-            pheromones.values().stream()
-            .forEach(pheromone -> {
-                float value = pheromone.getPheromoneValue();
-                value *= (0.07 * value);
-                value = value + 0.002f;
-                pheromone.minusPheromone(value);
-            });
+            pheromones.values().stream().forEach(Pheromone::evaporate);
         }
     }
 
-    public void addPheromone(PheromoneTypes pheromoneType, Point point, float value) {
+    public void dropPheromone(PheromoneTypes pheromoneType, Point point, int value) {
         final Map<Point, Pheromone> pheromoneMap = pheromones.get(pheromoneType);
-        pheromoneMap.get(point).addPheromone(value);
+        pheromoneMap.get(point).setPheromoneValue(value);
     }
 
     public Map<Point, Pheromone> getPheromone(

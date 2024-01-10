@@ -11,14 +11,12 @@ import App.Util.Directionals;
 public class Main {
     public static void main(String[] args) throws Exception {
         
-        SwingUtilities.invokeLater( () -> {
-            final UserInterface userInterface = 
-                new UserInterface(new Dimension(570,520)); // 520
+        final UserInterface userInterface = 
+            new UserInterface(new Dimension(570,520)); // 520
 
-            final World world = new World(new Dimension(100,100));
-                userInterface.setWorldForDisplay(world);
+        final World world = new World(new Dimension(100,100));
+            userInterface.setWorldForDisplay(world);
             
-            final Controller controller = new Controller(userInterface, world);
-        });
+        final Controller controller = new Controller(userInterface, world);
     }
 }

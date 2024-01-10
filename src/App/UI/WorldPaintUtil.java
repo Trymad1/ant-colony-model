@@ -4,9 +4,11 @@ import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.awt.Point;
 
 import App.Model.World;
+import App.Model.Entity.Creature;
 import App.Model.Entity.Entity;
 import App.Model.Entity.Pheromone.Pheromone;
 import App.Util.PheromoneTypes;
@@ -32,8 +34,9 @@ public final class WorldPaintUtil {
         
         try {
             if(displayCreature) entityList.putAll(world.getCreatures());
+
+            
         } catch (ConcurrentModificationException ignored) {
-            System.out.println("Bug");
             // TODO fix bug
 
             // Очень редко в этом участке кода выбрасывается исключение, 

@@ -27,7 +27,7 @@ public abstract class Entity {
         this.size = size;
         this.world = world;
         this.entityType = entityType;
-        point = new Point();
+        this.point = null;
     }
 
     public Entity(Color color, Point point, int size, World world, EntityTypes entityType) {

@@ -2,16 +2,14 @@ package App.Model.Entity.Ant;
 
 import java.awt.Color;
 import java.awt.Point;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-import App.Model.CanTake;
-import App.Model.Item;
 import App.Model.World;
 import App.Model.Entity.Creature;
+import App.Model.Interface.CanTake;
+import App.Model.Interface.Item;
 import App.Util.Directional;
 import App.Util.Directionals;
 import App.Util.EntityParams;
@@ -20,10 +18,11 @@ import App.Util.PheromoneTypes;
 public abstract class Ant extends Creature implements CanTake {
 
     protected Optional<Item> takedItem;
-    protected Directional directional;
+    protected Directional directional; 
+    protected boolean inAnthill;
 
-    protected float pheromoneValue;
-    protected final float START_PHEROMONE_VALUE = 1.0f;
+    protected int pheromoneValue;
+    protected final int START_PHEROMONE_VALUE = 1;
 
     public Ant(Color color, Point point, World world) {
         this(color, world);
@@ -34,7 +33,7 @@ public abstract class Ant extends Creature implements CanTake {
         super(color, EntityParams.Sizes.ANT, world);
         takedItem = Optional.ofNullable(null);
         directional = Directionals.getRandomDirectional();
-        pheromoneValue = START_PHEROMONE_VALUE;
+        inAnthill = true;
     }
 
     @Override
@@ -47,18 +46,23 @@ public abstract class Ant extends Creature implements CanTake {
 
     @Override
     public void update() {
-        if (findPointToMove().isPresent()) {
-            move(findPointToMove().get());
-            dropPheromone(getDroppedPheromone(), point);
+        if(inAnthill == true) return;
+        final Optional<Point> pointToMove = findPointToMove();
+        if (pointToMove.isPresent()) {
+            dropPheromone(point);
+            move(pointToMove.get());
         } else {
             this.directional = Directionals.getRandomDirectional();
         };
     }
 
-    protected void dropPheromone(PheromoneTypes type, Point point) {
+    protected void dropPheromone(Point point) {
+        if (pheromoneValue > 200) {
+            return;
+        }
         final PheromoneTypes pheromoneType = getDroppedPheromone();
-        super.getPheromoneUtil().addPheromone(type, point, pheromoneValue);
-        pheromoneValue /=  1.1;
+        super.getPheromoneUtil().dropPheromone(pheromoneType, point, pheromoneValue);
+        pheromoneValue++;
     } 
  
     protected List<Point> getPointOnDirectional(List<Point> points) {
@@ -90,5 +94,13 @@ public abstract class Ant extends Creature implements CanTake {
     protected PheromoneTypes getTargetPheromone() {
         return takedItem.isPresent() ? 
             PheromoneTypes.TO_ANTHILL : PheromoneTypes.TO_TARGET;
+    }
+
+    protected boolean inAnthill() {
+        return inAnthill;
+    }
+
+    protected void setInAnthill(boolean inAnthill) {
+        this.inAnthill = inAnthill;
     }
 }

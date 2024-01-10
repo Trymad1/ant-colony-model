@@ -13,7 +13,7 @@ import App.Model.Entity.Entity;
 public abstract class Entities {
     public static List<Point> findEmptyPoint(Map<Point, Optional<Entity>> nearPoint) {
         return nearPoint.entrySet().stream()
-            .filter(entrySet -> entrySet.getValue().isEmpty())
+            .filter(entrySet -> !entrySet.getValue().isPresent())
             .map(entrySet -> entrySet.getKey())
             .collect(Collectors.toList());
     }

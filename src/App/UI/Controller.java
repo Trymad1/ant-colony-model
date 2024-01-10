@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import javax.swing.JOptionPane;
 
 import App.Model.World;
+import App.Model.Entity.Ant.Anthill;
 import App.Util.WorldPaintMode;
 
 public class Controller {
@@ -13,28 +14,31 @@ public class Controller {
     public final World world;
     private final Thread worldThread;
     public boolean isRunning;
+    public boolean isClosed;
 
     public Controller(UserInterface ui, World world) {
         this.userInterface = ui;
         this.world = world; 
         isRunning = false;
+        isClosed = false;
 
         userInterface.getStartButton().addActionListener(this::startButtonPressed);
         userInterface.getDeveloperInfo().addActionListener(this::aboutDeveloperPressed);
         userInterface.getAppInfo().addActionListener(this::aboutAppPressed);
 
         worldThread = new Thread(new Controller.WorldThread());
-        worldThread.setDaemon(true);
         worldThread.start();
     }
     
-    private synchronized void startButtonPressed(ActionEvent e) {
+    private void startButtonPressed(ActionEvent e) {
         if(!world.isCreated()) world.createRandomWorld();
 
         if(!isRunning) {    
             isRunning = true;
+            userInterface.getStartButton().setText("Стоп");
         } else {
             isRunning = false;
+            userInterface.getStartButton().setText("Старт");
         };
     }
 
@@ -66,6 +70,13 @@ public class Controller {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
+                    userInterface.setAntQuant(world.getAntQuant());
+                    userInterface.setAntWithFood(world.getAntWithFood());
+                    userInterface.setAntWithoutFood(world.getAntWithoutFood());
+                    userInterface.setAnthillFood(world.getAnthillFoodQuant());
+
+                    Anthill anthill = (Anthill) world.getAnthill().values().toArray()[0];
+                    userInterface.setFoodConsumption(anthill.getFoodConsumption());
                     world.update();
                 }
             }

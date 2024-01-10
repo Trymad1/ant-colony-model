@@ -9,22 +9,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.stream.Collectors;
 
 import App.Model.Entity.Entity;
+import App.Model.Entity.Ant.Ant;
 import App.Model.Entity.Ant.Anthill;
 import App.Model.Entity.Ant.CollectorAnt;
-import App.Model.Entity.Ant.SoldierAnt;
 import App.Model.Entity.Food.FoodSource;
 import App.Model.Entity.Pheromone.Pheromone;
 import App.Model.Entity.Pheromone.PheromoneUtil;
 import App.Model.Entity.Pheromone.ToAnthillPheromone;
 import App.Model.Entity.Pheromone.ToTargetPheromone;
+import App.Model.Interface.Updatable;
 import App.Util.Entities;
+import App.Util.EntityParams;
 import App.Util.EntityTypes;
 import App.Util.PheromoneTypes;
 import App.Util.Worlds;
 
-public class World {
+public class World implements Updatable {
 
     private final Map<EntityTypes, Map<Point, Entity>> entities;
     private final List<Updatable> updatableObjects;
@@ -39,7 +42,7 @@ public class World {
     private Dimension worldSize;
 
     public final int COLLECTORS_ON_CREATE = 30; // 30
-    public final int FOOD_ON_CREATE = 20; // 5
+    public final int FOOD_ON_CREATE = 7; // 5
     public final int SOLDIER_ON_CREATE = 0; // 20
 
     private final int DEFAULT_SIZE_WIDTH = 100;
@@ -76,6 +79,11 @@ public class World {
     }
 
     public void update() {
+        removeFromQueue(toRemove);
+        randomSpawnInWorld();
+        final Anthill anthill 
+            = (Anthill) entities.get(EntityTypes.ANTHILL).values().toArray()[0];
+        anthill.foodConsum(getAntQuant());
         updatableObjects.stream().forEach(Updatable::update);
         pheromoneUtil.update();
     }
@@ -97,13 +105,6 @@ public class World {
             ((worldSize.width - 1) / 2),
             ((worldSize.height - 1) / 2));
             createEntity(new Anthill(anthillPoint, this));
-            
-        final Point antSpawnAreaA = 
-            new Point((worldSize.width - 10) / 2, (worldSize.height -10) / 2);
-
-        final Point antSpawnAreaB 
-            = new Point((worldSize.width - 1) - antSpawnAreaA.x, 
-                        (worldSize.height - 1) - antSpawnAreaA.y); 
 
         final Point pointNearAnthillA = 
             new Point((worldSize.width - 1) / 3, (worldSize.height -1) / 3);
@@ -115,24 +116,16 @@ public class World {
         final List<Point> pointsNearAnthill = Worlds.getArea(
             pointNearAnthillA, pointNearAnthillB);
         
-        final List<Point> emptyPointsNearAnthill = Worlds.getEmptyPointFromArea(
-            pointsNearAnthill, this.getAllEntities());
-
-        final List<Point> emptyPointsForAnt = Worlds.getEmptyPointFromArea(
-            Worlds.getArea(antSpawnAreaA, antSpawnAreaB), this.getAllEntities());
-        
         for (int i = 0; i < COLLECTORS_ON_CREATE; i++) {
-            final Entity entity = randomSpawn(new CollectorAnt(this), emptyPointsForAnt);
-            if(entity != null) emptyPointsForAnt.removeAll(
-                Entities.getPointsForEntity(entity.getPoint(), entity.getSize()));
+            final Entity entity = createEntity(new CollectorAnt(this));
+            entities.get(EntityTypes.ANTHILL).values().forEach(
+                element -> {
+                    Anthill anthill = (Anthill) element;
+                    anthill.addInAnthill((Ant) entity);
+                }
+            );
         }
 
-        for (int i = 0; i < SOLDIER_ON_CREATE; i++) {
-            final Entity entity = randomSpawn(new SoldierAnt(this), emptyPointsNearAnthill);
-            if(entity != null) emptyPointsNearAnthill.removeAll(
-                Entities.getPointsForEntity(entity.getPoint(), entity.getSize()));
-        }
-        
         // Обозначение зоны для спавна других сущностей
         allPointsInWorld.stream()
         .filter(point -> !(pointsNearAnthill.contains(point)))
@@ -175,41 +168,58 @@ public class World {
         return entity;
     }
 
+    private final int MINIMUM_QUANT_FOODSOURCE_FOR_SPAWN = 6 * EntityParams.Sizes.FOOD_SOURCE;
+    private final int ATTEMP_TO_RANDOM_SPAWN = 10;
+    
+    private void randomSpawnInWorld() {
+        final List<Entity> foodSource = 
+            entities.get(EntityTypes.OBJECT).values().stream()
+            .filter(entity -> entity instanceof FoodSource)
+            .collect(Collectors.toList());
+        if (foodSource.size() > MINIMUM_QUANT_FOODSOURCE_FOR_SPAWN) {
+            return;
+        }
+
+        Entity newFoodSource = null;
+        int attempCounter = 0;
+        while (newFoodSource == null && attempCounter <= ATTEMP_TO_RANDOM_SPAWN) {
+            newFoodSource = randomSpawn(new FoodSource(this), 
+                       Worlds.getEmptyPointFromArea(areaForRandomSpawn, getAllEntities()));
+            attempCounter++;
+        }
+    }
+
     private Entity createEntity(Entity entity) {
         // Единица в четном случае отнимается для того, чтобы
         // центр элемента оставался в том же месте
-        
-        List<Point> coord = Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
-        if (isPossibleToCreate(coord) == false) return null;
-        coord.forEach(emptyPoint -> {
-            final EntityTypes entityType = entity.getEntityType();
-            entities.get(entityType).put(emptyPoint, entity);
-        });
-        
+        if (entity.getPoint() != null) {
+            List<Point> coord = Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
+            if (isPossibleToCreate(coord) == false) return null;
+            coord.forEach(emptyPoint -> {
+                final EntityTypes entityType = entity.getEntityType();
+                entities.get(entityType).put(emptyPoint, entity);
+            });
+        }
+
         if (entity instanceof Updatable) updatableObjects.add( (Updatable) entity);
 
-        return entity;  
+        return entity;
     }
 
     public void addToRemoveEntity(Entity entity) {
         toRemove.add(entity);
     }
 
-    // private void removeFromQueue(Queue<Entity> toRemove) {
-    //     while(!toRemove.isEmpty()) {
-    //         removeEntity(toRemove.poll());
-    //     }
-    // }
+    private void removeFromQueue(Queue<Entity> toRemove) {
+        while(!toRemove.isEmpty()) {
+            removeEntity(toRemove.poll());
+        }
+    }
 
     public void addToCreateEntity(Entity entity) {
         toCreate.add(entity);
     }
 
-    private void createFromQueue(Queue<Entity> toCreate) {
-        // while(!toCreate.isEmpty()) {
-        //     createEntity(toCreate.poll());
-        // }
-    }
 
     private Entity removeEntity(Entity entity) {
         List<Point> entityPoints = 
@@ -232,7 +242,7 @@ public class World {
         return !isNotEmptyCoord;
     }
     
-    // TOO CLEAR ENTITIES
+    // TODO CLEAR ENTITIES
     public void clearWorld() {
         updatableObjects.clear();
         pheromones.get(PheromoneTypes.TO_ANTHILL).clear();
@@ -240,7 +250,7 @@ public class World {
     }
 
     public void relocateEntity(Entity entity, Point point) {
-        entities.get(entity.getEntityType()).remove(entity.getPoint());
+        if(entity.getPoint() != null) entities.get(entity.getEntityType()).remove(entity.getPoint());
         entities.get(entity.getEntityType()).put(point, entity);
     }
 
@@ -261,6 +271,26 @@ public class World {
         return allEntities;
     }
 
+    public int getAntQuant() {
+        return entities.get(EntityTypes.CREATURE).values().stream()
+        .filter(entity -> entity instanceof Ant)
+        .collect(Collectors.toList()).size();
+    }
+
+    public int getAntWithFood() {
+        return entities.get(EntityTypes.CREATURE).values().stream()
+        .filter(entity -> entity instanceof Ant)
+        .filter(entity -> entity.getColor() == EntityParams.Colors.FOOD)
+        .collect(Collectors.toList()).size();
+    }
+
+    public int getAntWithoutFood() {
+        return entities.get(EntityTypes.CREATURE).values().stream()
+        .filter(entity -> entity instanceof Ant)
+        .filter(entity -> entity.getColor() == EntityParams.Colors.ANT_COLLECTOR)
+        .collect(Collectors.toList()).size();
+    }
+
     public Map<Point, Entity> getCreatures() {
         return entities.get(EntityTypes.CREATURE);
     }
@@ -269,9 +299,15 @@ public class World {
         return entities.get(EntityTypes.OBJECT);
     }
 
+    public float getAnthillFoodQuant() {
+        return entities.get(EntityTypes.ANTHILL).values().stream()
+        .map(entity -> (Anthill) entity)
+        .findFirst().get().getFoodQuantity();
+    }
+
     public Map<Point, Entity> getAnthill() {
         return entities.get(EntityTypes.ANTHILL);
-    }   
+    }
 
     public boolean isCreated() {
         return !entities.get(EntityTypes.ANTHILL).isEmpty();

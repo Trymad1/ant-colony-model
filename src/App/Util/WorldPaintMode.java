@@ -4,8 +4,8 @@ public enum WorldPaintMode {
     ALL_ENTITIES("Стандартный",true, true, true, false, false), 
     ONLY_OBJECTS("Только обьекты",true, true, false, false, false), 
     ONLY_CREATURE("Только сущности",false, false, true, false, false),
-    PHEROMONE_TO_ANTHILL("Феромон поиска дома",true, true, false, true, false),
-    PHEROMONE_TO_TARGET("Феромон поиска еды",true, true, false, false, true);
+    PHEROMONE_TO_ANTHILL("Феромон поиска дома",true, true, true, true, false),
+    PHEROMONE_TO_TARGET("Феромон поиска еды",true, true, true, false, true);
 
     public final String name;
     public final boolean displayAnthill;
