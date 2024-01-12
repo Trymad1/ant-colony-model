@@ -1,5 +1,8 @@
 package Model;
 
+/**
+ * Настройки для модели. Создаются при помощи Builder класса.
+ */
 public class Setting {
 
     private int antQuant;
@@ -67,6 +70,9 @@ public class Setting {
         return new SettingBuilder();
     }
 
+    /**
+     * Builder класс, который создает экземпляры класса Setting методом build
+     */
     public static class SettingBuilder {
 
         int antQuant;

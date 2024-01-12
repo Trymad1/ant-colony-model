@@ -23,6 +23,9 @@ import Model.World;
 import Util.Enum.WorldPaintMode;
 import Util.Static.EntityParams;
 
+/**
+ * Содержит исключительно UI пользователя
+ */
 public class UserInterface extends JFrame {
 
     private final WorldPanel worldPanel;

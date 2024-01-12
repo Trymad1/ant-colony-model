@@ -47,6 +47,8 @@ public class WorldPanel extends JPanel implements Updatable {
     private final int WORLD_BOUND = 5;
 
     @Override
+    // Получение данных с класса World, отрисовка содержимого на панели
+    // с масштабированием 3 : 1
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         final Graphics2D g2d = (Graphics2D) g;    

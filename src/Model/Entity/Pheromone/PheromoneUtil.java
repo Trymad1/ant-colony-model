@@ -23,13 +23,16 @@ public class PheromoneUtil implements Updatable {
     public void update() {
         evaporationPheromone();
     }
-    // TOOD formula
+    //  Вызывает метод испарения у каждого существующего феромона
     private void evaporationPheromone() {
         for (Map<Point, Pheromone> pheromones : this.pheromones.values()) {
             pheromones.values().stream().forEach(Pheromone::evaporate);
         }
     }
 
+    /*
+     * Попытка обновить значение феромона на определенной каоординате
+     */
     public void dropPheromone(PheromoneTypes pheromoneType, Point point, int value) {
         final Map<Point, Pheromone> pheromoneMap = pheromones.get(pheromoneType);
         pheromoneMap.get(point).setPheromoneValue(value);
