@@ -197,7 +197,7 @@ public class World implements Updatable {
     }
     
     /**
-     * Отвечает за рандомный спавн сущностей в ходе уже запущенной модели мира
+     * Отвечает за рандомные события в мире такие как появление новых сущностей или смерть старых
      */
     private final int ATTEMP_TO_RANDOM_SPAWN = 10;
     private final int PERSENT_TO_ANT_DIE = 1;
