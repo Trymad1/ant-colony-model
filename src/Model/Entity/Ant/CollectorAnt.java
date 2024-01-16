@@ -60,7 +60,7 @@ public class CollectorAnt extends Ant {
            !takedItem.isPresent()) {
             take(foodSource.get().getFood());
             
-            Map<Point, Pheromone> nearPheromone = 
+            final Map<Point, Pheromone> nearPheromone = 
                 getPheromoneUtil().getPheromone(this.getTargetPheromone(), nearEmptyPoints);
             this.directional = this.getHighValueDirectional(nearPheromone);
             pheromoneValue = 1;
@@ -74,7 +74,7 @@ public class CollectorAnt extends Ant {
             anthill.get().putFood( (Food) takedItem.get());
             takedItem = Optional.ofNullable(null);
             
-            Map<Point, Pheromone> nearPheromone = 
+            final Map<Point, Pheromone> nearPheromone = 
                 getPheromoneUtil().getPheromone(this.getTargetPheromone(), nearEmptyPoints);
             this.directional = this.getHighValueDirectional(nearPheromone);
             pheromoneValue = 1;
@@ -86,7 +86,7 @@ public class CollectorAnt extends Ant {
         
         // Если рядом не было никаких обьектов, муравей попытается найти соседнюю точку
         // с самым большим значением феромона. Муравей не может наступить на последние 3 точки которые посетил
-        List<Point> emptyNotVisitedPoint = nearEmptyPoints.stream()
+        final List<Point> emptyNotVisitedPoint = nearEmptyPoints.stream()
         .filter(point -> !lastVisitedPoint.contain(point))
         .collect(Collectors.toList());
         
@@ -95,14 +95,14 @@ public class CollectorAnt extends Ant {
             return Optional.ofNullable(null);
         }
         
-        Map<Point, Pheromone> nearPheromone = 
+        final Map<Point, Pheromone> nearPheromone = 
             getPheromoneUtil().getPheromone(pheromoneType, emptyNotVisitedPoint);
         
-        Optional<Point> highValue = getHighPheromoneValuePoint(nearPheromone);
+        final Optional<Point> highValue = getHighPheromoneValuePoint(nearPheromone);
 
         // Если рядом есть точка с высшим значением феромона, муравей переместится на нее
         if (highValue.isPresent()) {
-            Point highPoint = highValue.get();
+            final Point highPoint = highValue.get();
             this.directional = Directionals.getDirectional(
                 new Point(highPoint.x - point.x, highPoint.y - point.y));
             lastVisitedPoint.add(highPoint);
@@ -110,13 +110,13 @@ public class CollectorAnt extends Ant {
 
         } else {
         // Иначе, если рядом нет феромона он будет двигатся случайным образом в направлении своего движения
-            List<Point> emptyPointToMoveDirectional = 
+            final List<Point> emptyPointToMoveDirectional = 
                 this.getPointOnDirectional(emptyNotVisitedPoint);
                 if (emptyPointToMoveDirectional.size() == 0) {
                     return Optional.ofNullable(null);
                 }
             int random = (int) (Math.random() * emptyPointToMoveDirectional.size());
-            Point randomPointToMove = emptyPointToMoveDirectional.get(random);
+            final Point randomPointToMove = emptyPointToMoveDirectional.get(random);
             this.directional = Directionals.getDirectional(
                 new Point(randomPointToMove.x - point.x, randomPointToMove.y - point.y));
             lastVisitedPoint.add(randomPointToMove);
@@ -129,7 +129,7 @@ public class CollectorAnt extends Ant {
      */
     private Directional getHighValueDirectional(Map<Point, Pheromone> pheromone) {
             
-        Optional<Point> highPheromoneValuePoint = getHighPheromoneValuePoint(pheromone);
+        final Optional<Point> highPheromoneValuePoint = getHighPheromoneValuePoint(pheromone);
     
         if (highPheromoneValuePoint.isPresent()) {
             return getNewDirectional(highPheromoneValuePoint.get());

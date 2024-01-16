@@ -48,9 +48,9 @@ public class FoodSource extends Entity {
         foodQuantity--;
         if(foodQuantity == 0) setToRemove();
 
-        final float MIN_FOODVALUE = 2.2f;
-        final float MAX_FOODVALUE = 4.2f;
-        return new Food(new Random().nextFloat() * (MAX_FOODVALUE - MIN_FOODVALUE));
+        final float MIN_FOODVALUE = 0.2f;
+        final float MAX_FOODVALUE = 2.2f;
+        return new Food(MIN_FOODVALUE + (new Random().nextFloat() * (MAX_FOODVALUE - MIN_FOODVALUE)));
     }       
 
     public boolean hasFood() {

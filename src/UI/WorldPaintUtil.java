@@ -1,5 +1,6 @@
 package UI;
 
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 
 import java.util.Map;
@@ -29,20 +30,18 @@ public final class WorldPaintUtil {
      * @param world мир, с которого будут извлечены сущности
      * @return список сущностей, которые будут отрисованы
      */
-    public Map<Point, Entity> getEntityListForDisplay(World world)  {
+    public Map<Point, Entity> getEntityListForDisplay(World world) throws ConcurrentModificationException {
         final Map<Point, Entity> entityList = new HashMap<>();
+
 
         if(displayAnthill) entityList.putAll(world.getAnthill());  
         if(displayObjects) entityList.putAll(world.getObjects());
-        
-        
         if(displayCreature) entityList.putAll(world.getCreatures());
 
- 
 
         if(displayPheromoneToTarget) {
 
-            Map<Point, Pheromone> toTargetPheromone = 
+            final Map<Point, Pheromone> toTargetPheromone = 
                 getCopyPheromoneMap(PheromoneTypes.TO_TARGET, world);
             // Удаление из списка феромонов точек, на которых расположены другие сущности
             entityList.keySet().stream()
@@ -53,7 +52,7 @@ public final class WorldPaintUtil {
         }
 
         else if(displayPheromoneToAnthill) {
-            Map<Point, Pheromone> toTargetPheromone = 
+            final Map<Point, Pheromone> toTargetPheromone = 
                 getCopyPheromoneMap(PheromoneTypes.TO_ANTHILL, world);
             // Удаление из списка феромонов точек, на которых расположены другие сущности
             entityList.keySet().stream()

@@ -11,11 +11,11 @@ public class Setting {
     float startFoodValue;
     float foodConsumption;
 
-    public static final int DEFAULT_ANT_QUANT = 50;
-    public static final int DEFAULT_FOOD_SOURCE_QUANT = 6;
-    public static final int DEFAULT_FOOD_IN_SOURCE_QUANT = 200;
+    public static final int DEFAULT_ANT_QUANT = 30;
+    public static final int DEFAULT_FOOD_SOURCE_QUANT = 7;
+    public static final int DEFAULT_FOOD_IN_SOURCE_QUANT = 150;
     public static final float DEFAULT_START_FOOD_VALUE = 100;
-    public static final float DEFAULT_FOOD_CONSUMPTION = 0.004f;
+    public static final float DEFAULT_FOOD_CONSUMPTION = 0.006f;
 
     private Setting(int antQuant, int foodSourceQuant, int foodInSourceQuant, 
     float startFoodValue, float foodConsuption) {

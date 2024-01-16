@@ -75,7 +75,7 @@ public class Anthill extends Entity implements Updatable {
 
     @Override
     public void update() {
-        List<Point> emptyPoints = Entities.findEmptyPoint(getNearPoints());
+        final List<Point> emptyPoints = Entities.findEmptyPoint(getNearPoints());
         emptyPoints.forEach(point -> {
             final Ant ant = ants.poll();
             if(ant == null) return;

@@ -35,7 +35,7 @@ public class UserInterface extends JFrame {
 
     private final JLabel colonyLabel, speedLabel, paintModeLabel;
 
-    private final InfoLabel<Integer> antQuantityInfo, antWithoutFood, antWithFood;
+    private final InfoLabel<Integer> antQuantityInfo, antWithoutFood, antWithFood, diedAnts;
 
     private final InfoLabel<Float> colonyFoodInfo, foodConsumption;
 
@@ -83,8 +83,8 @@ public class UserInterface extends JFrame {
         antQuantityInfo = new InfoLabel<Integer>("Всего муравьев:", 0);
         antWithoutFood = new InfoLabel<Integer>("Без еды:", 0, EntityParams.Colors.ANT_COLLECTOR);
         antWithFood = new InfoLabel<Integer>("С едой", 0, EntityParams.Colors.FOOD);
-        // antSoldierInfo = new InfoLabel<Integer>("Воинов:", 0, EntityParams.Colors.ANT_SOLDIER);
-        // antScoutInfo = new InfoLabel<Integer>("Разведчиков:", 0, EntityParams.Colors.ANT_SCOUT);
+        diedAnts = new InfoLabel<Integer>("Погибло", 0, Color.RED);
+
         colonyFoodInfo = new InfoLabel<Float>("Еда:", 0.0f);
         foodConsumption = new InfoLabel<Float>("Потребление: ", 0f);
 
@@ -215,8 +215,7 @@ public class UserInterface extends JFrame {
         antInfoPanel.add(emptyPanel);
         antInfoPanel.add(antWithoutFood);
         antInfoPanel.add(antWithFood);
-        // antInfoPanel.add(antSoldierInfo);
-        // antInfoPanel.add(antScoutInfo);
+        antInfoPanel.add(diedAnts);
 
         colonyInfoPanel.add(colonyLabel);
         colonyInfoPanel.add(colonyFoodInfo);
@@ -243,6 +242,7 @@ public class UserInterface extends JFrame {
         antWithoutFood.setValue(0);
         colonyFoodInfo.setValue(0f);
         foodConsumption.setValue(0f);
+        diedAnts.setValue(0);
     }
     
     public JMenuItem getDeveloperInfo() {
@@ -277,6 +277,10 @@ public class UserInterface extends JFrame {
         this.foodConsumption.setValue(quant);
     }
 
+    public void setDiedAnts(int quant) {
+        this.diedAnts.setValue(quant);
+    }
+
     public JButton getStartButton() {
         return startButton;
     }
@@ -291,6 +295,10 @@ public class UserInterface extends JFrame {
 
     public JMenuItem getReset() {
         return reset;
+    }
+
+    public InfoLabel<Integer> getDiedAnts() {
+        return diedAnts;
     }
     
     public JMenuItem getSetting() {

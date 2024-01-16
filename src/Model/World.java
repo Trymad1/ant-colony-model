@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import Model.Entity.Entity;
@@ -58,13 +59,15 @@ public class World implements Updatable {
     private final int DEFAULT_SIZE_HEIGHT = 100;
 
     private Setting setting;
+    private int diedAnt;
+    private int iterationCount = 0;
 
     
     public World() {
 
         this.setting = SettingBuilder.createDefaultSetting();
 
-        Map<EntityTypes, Map<Point, Entity>> tempEntities = new HashMap<>();
+        final Map<EntityTypes, Map<Point, Entity>> tempEntities = new HashMap<>();
         tempEntities.put(EntityTypes.ANTHILL, new HashMap<>());
         tempEntities.put(EntityTypes.CREATURE, new HashMap<>());
         tempEntities.put(EntityTypes.OBJECT, new HashMap<>());
@@ -95,12 +98,13 @@ public class World implements Updatable {
      */
     public void update() {
         removeFromQueue(toRemove);
-        randomSpawnInWorld();
+        randomActionsInWorld();
         final Anthill anthill 
             = (Anthill) entities.get(EntityTypes.ANTHILL).values().toArray()[0];
         anthill.foodConsum(getAntQuant());
         updatableObjects.stream().forEach(Updatable::update);
         pheromoneUtil.update();
+        iterationCount++;
     }
 
     /**
@@ -108,7 +112,7 @@ public class World implements Updatable {
      */
     public void createRandomWorld() {
         
-        List<Point> allPointsInWorld = 
+        final List<Point> allPointsInWorld = 
         Worlds.getArea(new Point(0, 0), 
                 new Point(worldSize.width - 1, worldSize.height - 1));
                 
@@ -131,7 +135,7 @@ public class World implements Updatable {
         final Point pointNearAnthillB 
             = new Point((worldSize.width - 1) - pointNearAnthillA.x, 
                         (worldSize.height - 1) - pointNearAnthillA.y); 
-                        
+                  
         // Создание и размещение муравьев
         final List<Point> pointsNearAnthill = Worlds.getArea(
             pointNearAnthillA, pointNearAnthillB);
@@ -181,7 +185,7 @@ public class World implements Updatable {
             
             int randomPointForSpawn = (int) (Math.random() * area.size());
             final Point emptyPoint = area.get(randomPointForSpawn);
-            List<Point> entityPoints = Entities.getPointsForEntity(emptyPoint, entity.getSize());
+            final List<Point> entityPoints = Entities.getPointsForEntity(emptyPoint, entity.getSize());
             boolean canPlace = entityPoints.stream().allMatch(point -> area.contains(point));
 
             if(!canPlace) continue;
@@ -189,35 +193,58 @@ public class World implements Updatable {
             createEntity(entity);
             break;
         }
-
         return entity;
     }
-
     
     /**
      * Отвечает за рандомный спавн сущностей в ходе уже запущенной модели мира
      */
     private final int ATTEMP_TO_RANDOM_SPAWN = 10;
+    private final int PERSENT_TO_ANT_DIE = 1;
+    private final int PERSENT_TO_ANT_SPAWN = 1;
 
-    private void randomSpawnInWorld() {
-        int minimumFoodSourceForSpawn = (setting.getFoodSourceQuant() / 2) >= 1 ?
-        (setting.getFoodSourceQuant() / 2) * EntityParams.Sizes.FOOD_SOURCE :
-        1 * EntityParams.Sizes.FOOD_SOURCE;
+    private void randomActionsInWorld() {
+        if (iterationCount < setting.getAntQuant() + 10) {
+            return;
+        }
+
+        final int minimumFoodSourceForSpawn = setting.getFoodSourceQuant() * (EntityParams.Sizes.FOOD_SOURCE * 2);
 
         final List<Entity> foodSource = 
             entities.get(EntityTypes.OBJECT).values().stream()
             .filter(entity -> entity instanceof FoodSource)
             .collect(Collectors.toList());
-        if (foodSource.size() > minimumFoodSourceForSpawn) {
-            return;
+        if (foodSource.size() < minimumFoodSourceForSpawn) {
+            Entity newFoodSource = null;
+            int attempCounter = 0;
+            while (newFoodSource == null && attempCounter <= ATTEMP_TO_RANDOM_SPAWN) {
+                newFoodSource = randomSpawn(new FoodSource(this, setting.getFoodInSourceQuant()), 
+                           Worlds.getEmptyPointFromArea(areaForRandomSpawn, getAllEntities()));
+                attempCounter++;
+            }
         }
 
-        Entity newFoodSource = null;
-        int attempCounter = 0;
-        while (newFoodSource == null && attempCounter <= ATTEMP_TO_RANDOM_SPAWN) {
-            newFoodSource = randomSpawn(new FoodSource(this, setting.getFoodInSourceQuant()), 
-                       Worlds.getEmptyPointFromArea(areaForRandomSpawn, getAllEntities()));
-            attempCounter++;
+        final Anthill anthill 
+            = (Anthill) entities.get(EntityTypes.ANTHILL).values().toArray()[0];
+        final Random random = new Random();
+        final List<Entity> ants = entities.get(EntityTypes.CREATURE).values().stream()
+        .filter(entity -> entity instanceof Ant).collect(Collectors.toList());
+
+        if(ants.size() == 0) return;
+        if(anthill.getFoodQuantity() <= 0f && random.nextInt(100) < PERSENT_TO_ANT_DIE) {
+            toRemove.add((ants.get(random.nextInt(ants.size()))));
+            diedAnt++;
+        }
+
+        // Значение еды для шанса появления следующего муравья растет экспоненциально
+        // в зависимости от количества муравьев,
+        final double formulaForNewAnt = (Math.pow(1.16, getAntQuant()));
+        System.out.println(formulaForNewAnt);
+
+        if (formulaForNewAnt < anthill.getFoodQuantity() && random.nextInt(100) < PERSENT_TO_ANT_SPAWN) {
+            final Ant newAnt = new CollectorAnt(this);
+            createEntity(newAnt);
+            anthill.addInAnthill(newAnt);
         }
     }
 
@@ -230,7 +257,7 @@ public class World implements Updatable {
         // Единица в четном случае отнимается для того, чтобы
         // центр элемента оставался в том же месте
         if (entity.getPoint() != null) {
-            List<Point> coord = Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
+            final List<Point> coord = Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
             if (isPossibleToCreate(coord) == false) return null;
             coord.forEach(emptyPoint -> {
                 final EntityTypes entityType = entity.getEntityType();
@@ -265,7 +292,7 @@ public class World implements Updatable {
      * @return - переданная в параметрах сущность
      */
     private Entity removeEntity(Entity entity) {
-        List<Point> entityPoints = 
+        final List<Point> entityPoints = 
             Entities.getPointsForEntity(entity.getPoint(), entity.getSize());
         if(entity instanceof Updatable) updatableObjects.remove( (Updatable) entity);
         entityPoints.stream().forEach(point -> {
@@ -280,7 +307,7 @@ public class World implements Updatable {
      * @return - false если переданыне координаты не входят в размеры мира, или заняты другими сущностями, иначе true
      */
     private boolean isPossibleToCreate(List<Point> coord) {
-        boolean isNotEmptyCoord = 
+        final boolean isNotEmptyCoord = 
         coord.stream()
         .anyMatch(point -> 
             (point.x >= 0 && point.y >= 0) &&
@@ -299,6 +326,8 @@ public class World implements Updatable {
         
         entities.values().forEach(Map::clear);
         toRemove.clear();
+        iterationCount = 0;
+        diedAnt = 0;
     }
 
     /**
@@ -392,5 +421,9 @@ public class World implements Updatable {
 
     public void setSetting(Setting setting) {
         this.setting = setting;
+    }
+
+    public int getDiedAnt() {
+        return diedAnt;
     }
 }

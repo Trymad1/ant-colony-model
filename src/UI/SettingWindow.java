@@ -47,7 +47,7 @@ public class SettingWindow extends JFrame {
 
         setSetting(setting);
 
-        JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        final JPanel panel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 
         accept = new JButton("Принять");
         defaultSetting = new JButton("По умолчанию");
@@ -66,7 +66,7 @@ public class SettingWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                setSetting(setting);
+                setSetting(getSetting());
                 setVisible(false);
             }
         });

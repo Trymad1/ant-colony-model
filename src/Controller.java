@@ -1,10 +1,15 @@
 
 
+import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.JOptionPane;
 
 import Model.World;
+import Model.Entity.Entity;
 import Model.Entity.Ant.Anthill;
 import Model.Setting.SettingBuilder;
 import UI.SettingWindow;
@@ -97,7 +102,7 @@ public class Controller {
         }
     }
 
-    // Новый поток, отвечающий за делегирование моделью
+    // Новый поток, отвечающий за обновление информации о модели и инициаицей итераций в мире
     private class WorldThread implements Runnable {
 
         @Override
@@ -112,7 +117,22 @@ public class Controller {
                 final WorldPaintMode selectedPaintMode = 
                 (WorldPaintMode) userInterface.getPaintModeComboBox().getSelectedItem();
                 userInterface.getWorldPanel().setWorldPaintMode(selectedPaintMode);
-                userInterface.getWorldPanel().repaint();
+
+                Map<Point, Entity> entityListForDisplay = new HashMap<>();
+
+                try {
+                    entityListForDisplay = 
+                        userInterface.getWorldPanel().getWorldPaintUtil().getEntityListForDisplay(world);
+                } catch (ConcurrentModificationException ignoredBug) {
+                    // выбрасывается исключение во время инициализации новой модели
+                    // не влияет на работоспособность программы, вероятная причина проблемы
+                    // что нажатие на кнопку старт вызывает метод createRandomWorld
+                    // и данный поток пытается получить доступ к списку сущностей
+                    // одновременон с тем, как другой поток его заполняет. В данноом случае
+                    // проблемма решается добавлением синхронизационных блоков.
+                }
+
+                userInterface.getWorldPanel().repaint(entityListForDisplay);
 
                 if (isRunning) {
 
@@ -124,10 +144,13 @@ public class Controller {
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     }
+
+                    // Обновление данных о мире и запуск следующей итерации
                     userInterface.setAntQuant(world.getAntQuant());
                     userInterface.setAntWithFood(world.getAntWithFood());
                     userInterface.setAntWithoutFood(world.getAntWithoutFood());
                     userInterface.setAnthillFood(world.getAnthillFoodQuant());
+                    userInterface.setDiedAnts(world.getDiedAnt());
 
                     Anthill anthill = (Anthill) world.getAnthill().values().toArray()[0];
                     userInterface.setFoodConsumption(anthill.getFoodConsumption());

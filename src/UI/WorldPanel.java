@@ -5,7 +5,6 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
-import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,13 +23,13 @@ public class WorldPanel extends JPanel implements Updatable {
 
     private World world;
     private WorldPaintUtil worldPaintUtil;
-    private WorldPaintMode worldPaintMode;
+    private Map<Point, Entity> entityListForDisplay;
 
     public WorldPanel(World world) {
         super();
         this.world = world;
         this.worldPaintUtil = new WorldPaintUtil();
-        worldPaintMode = WorldPaintMode.ALL_ENTITIES;
+        this.entityListForDisplay = new HashMap<>();
         setOpaque(false);
         setBackground(Color.WHITE);
     }
@@ -38,7 +37,7 @@ public class WorldPanel extends JPanel implements Updatable {
     public WorldPanel() {
         super();
         this.worldPaintUtil = new WorldPaintUtil();
-        worldPaintMode = WorldPaintMode.ALL_ENTITIES;
+        this.entityListForDisplay = new HashMap<>();
         setOpaque(false);
         setBackground(Color.WHITE);
     };
@@ -52,26 +51,9 @@ public class WorldPanel extends JPanel implements Updatable {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         final Graphics2D g2d = (Graphics2D) g;    
-        
-        worldPaintUtil.setPaintMode(worldPaintMode);
-
-        Map<Point, Entity> entities = new HashMap<>();
-        try {
-            entities =   
-                worldPaintUtil.getEntityListForDisplay(world);
-        } catch (ConcurrentModificationException ignored) {
-            // TODO fix bug
-            // Изредка в этом участке кода выбрасывается исключение, 
-            // из за чего на текущей итерации мира сущности категории
-            // creature не удается получить в полном составе. 
-            // Так же начинает часто выбрасываться, если
-            // поставить метод обновления мира update() в потоке 
-            // WorldThread класса Controller раньше отрисовки поля. 
-            // Аналогично выбрасывается при высокой скорости воспроизведения
-        }
 
         final Point nextPoint = new Point(0,0);
-        entities.forEach((point, entity) -> {
+        entityListForDisplay.forEach((point, entity) -> {
             if(entity instanceof Pheromone) {
                 final Pheromone pheromone = (Pheromone) entity;
                 float alphaValue = 0;
@@ -90,6 +72,18 @@ public class WorldPanel extends JPanel implements Updatable {
         });
     }
 
+    public void setEntityListForDisplay(Map<Point, Entity> entityListForDisplay) {
+        this.entityListForDisplay = entityListForDisplay;
+    }
+
+    public WorldPaintUtil getWorldPaintUtil() {
+        return worldPaintUtil;
+    }
+
+    public Map<Point, Entity> getEntityListForDisplay() {
+        return entityListForDisplay;
+    }
+
     public void setWorld(World world) {
         this.world = world;
     }
@@ -98,8 +92,13 @@ public class WorldPanel extends JPanel implements Updatable {
         return world;
     }
 
+    public void repaint(Map<Point, Entity> entityListForDisplay) {
+        this.entityListForDisplay = entityListForDisplay;
+        repaint();
+    }
+
     public void setWorldPaintMode(WorldPaintMode worldPaintMode) {
-        this.worldPaintMode = worldPaintMode;
+        worldPaintUtil.setPaintMode(worldPaintMode);
     }
 
     @Override
