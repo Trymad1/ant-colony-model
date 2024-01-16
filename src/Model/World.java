@@ -239,7 +239,6 @@ public class World implements Updatable {
         // Значение еды для шанса появления следующего муравья растет экспоненциально
         // в зависимости от количества муравьев,
         final double formulaForNewAnt = (Math.pow(1.16, getAntQuant()));
-        System.out.println(formulaForNewAnt);
 
         if (formulaForNewAnt < anthill.getFoodQuantity() && random.nextInt(100) < PERSENT_TO_ANT_SPAWN) {
             final Ant newAnt = new CollectorAnt(this);
